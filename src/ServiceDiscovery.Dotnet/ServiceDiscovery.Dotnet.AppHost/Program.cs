@@ -8,6 +8,7 @@ builder.AddProject<Projects.ServiceDiscovery_Dotnet_Web>("webfrontend")
     .WithReference(cache)
     .WithReference(apiservice);
 
-builder.AddProject<Projects.ServiceDiscovery_Dotnet_ApiGateway>("servicediscovery.dotnet.apigateway");
+builder.AddProject<Projects.ServiceDiscovery_Dotnet_ApiGateway>("apigateway")
+    .WithReference(cache);
 
 builder.Build().Run();
