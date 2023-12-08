@@ -3,12 +3,13 @@
 @attribute [OutputCache(Duration = 5)]
 
 @inject GatewayApiClient GatewayApi
+@inject IDialogService DialogService
 
 <PageTitle>Gateway</PageTitle>
 
 <h1>Gateway</h1>
 
-<div style="height: 434px; overflow:auto;" tabindex="-1">
+<div style="height: 100%; overflow:visible;">
 @if (routes is null || clusters is null)
 {
     <p>Obtaining services please wait...</p>
@@ -30,16 +31,12 @@
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.MatchPath)" Sortable="true" />
             <TemplateColumn Title="Actions" Align="@Align.End">
-                <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))" />
-                <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
+                <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="()=> OpenEditAsync(context)" />
+                <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="()=>DeleteRouteAsync(context)" />
             </TemplateColumn>
-        </FluentDataGrid>        
-        <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size16.Add())" OnClick="@(() => Console.WriteLine("Add clicked"))" />
+        </FluentDataGrid>       
     }
-    else
-    {
-        
-    }
+    <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditAsync(new RouteDto()))" />
 }
 
 @if (clusters is not null)
@@ -57,20 +54,94 @@
             </TemplateColumn>
         </FluentDataGrid>        
     }
-    else
+    if(routes?.Length > 0)
     {
+        <div style="height: 100%;">
+            <FluentCombobox Style="margin-top: 10px;" Height="200px" Items=@routesCombo
+                OptionText="@(i => i.Text)" 
+                OptionValue="@(i => i.Value)" 
+                OptionSelected="@(i => i.Selected)"
+                @bind-SelectedOption="@selectedClusterOption"
+                @bind-Value="@clusterValue" />
+            <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditAsync(routes.Where(r => r.ClusterId == clusterValue).FirstOrDefault(),clusters.Where(c=> c.ClusterId == clusterValue)))" />
+        </div>
         
-    }
+    }   
 }
 </div>
 @code {
     private RouteDto[]? routes;
     private ClusterDto[]? clusters;
+    RouteDto? DialogData { get; set; }
+    bool canceled;
+
+    string? clusterValue;
+    Option<string> selectedClusterOption = default!;
+    private IEnumerable<Option<string>> routesCombo => routes is not null && routes.Length > 0 ? routes.Select(x=> new Option<string> { Value = x.ClusterId, Text = x.ClusterId }) : [];
 
     protected override async Task OnInitializedAsync()
     {
         //await Task.Delay(1000);
         routes = await GatewayApi.GetRoutesAsync();
         clusters = await GatewayApi.GetClustersAsync();
+    }
+    private async Task OpenEditAsync(RouteDto? routeDto,IEnumerable<ClusterDto>? clusterDto = default)
+    {
+        DialogData = routeDto;
+        if(DialogData is not null && !string.IsNullOrEmpty(DialogData?.RouteId))
+        {
+            var dialog = await DialogService.ShowDialogAsync<RouteDialog>(DialogData, new DialogParameters()
+            {
+                Height = "360px",
+                Title = $"Updating the Route: {DialogData.ClusterId}",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+            });
+
+            var result = await dialog.Result;
+            var data = result.Data as RouteDto;
+            routes = routes?.Select(r => r.RouteId != data?.RouteId 
+                                            ? r 
+                                            : r with 
+                                            {
+                                                ClusterId = data.ClusterId,
+                                                MatchPath = data.MatchPath
+                                            })
+                                            .ToArray();
+            StateHasChanged();
+        }
+        else    
+        {
+            var dialog = await DialogService.ShowDialogAsync<RouteDialog>(default, new DialogParameters()
+            {
+                Height = "360px",
+                Title = $"Create new route",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+            });
+
+            var result = await dialog.Result;
+            var data = result.Data as RouteDto;
+            if(data is not null)
+            {
+                routes = routes?.Select(x => x).Append(data).ToArray();
+                StateHasChanged();
+            }
+            
+        }
+        await Task.CompletedTask;
+        
+    }
+    private async Task DeleteRouteAsync(RouteDto routeDto)
+    {
+        var dialog = await DialogService.ShowConfirmationAsync($"Are you sure you want to delete the route {routeDto.RouteId} and his clusters?", "Delete", "Cancel", "Warning");
+        var result = await dialog.Result;
+        canceled = result.Cancelled;
+        if(!canceled)
+        {
+            routes = routes?.Where(r=> r.RouteId != routeDto?.RouteId).ToArray();
+            clusters = clusters?.Where(r=> r.ClusterId != routeDto?.ClusterId).ToArray();
+            StateHasChanged();
+        }
     }
 }

@@ -1,0 +1,75 @@
+@implements IDialogContentComponent<RouteDto>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    @if (Content is null)
+    {
+        <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Create</FluentButton>
+    }
+    else
+    {
+        <FluentButton Appearance="Appearance.Accent" OnClick="@UpdateAsync">Update</FluentButton>
+    }
+
+    <FluentButton Appearance="Appearance.Accent" OnClick="@CloseAsync">Close</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentStack Orientation="Orientation.Vertical">
+        @if (Content is not null)
+        {
+            <FluentTextField @bind-Value="@Content.ClusterId">ClusterId:</FluentTextField>
+            <FluentTextField @bind-Value="@Content.MatchPath">MatchPath:</FluentTextField>
+        }
+        else
+        {
+            <FluentTextField @bind-Value="@NewRouteId">RouteId:</FluentTextField>
+            <FluentTextField @bind-Value="@NewClusterId">ClusterId:</FluentTextField>
+            <FluentTextField @bind-Value="@NewMatchPath">MatchPath:</FluentTextField>
+        }
+
+    </FluentStack>
+</FluentDialogBody>
+
+@code {
+    [Parameter]
+    public RouteDto Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    string NewRouteId = string.Empty;
+    string NewClusterId = string.Empty;
+    string NewMatchPath = string.Empty;
+    
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync<RouteDto>(new RouteDto 
+            { 
+                RouteId = NewRouteId,
+                ClusterId = NewClusterId,
+                MatchPath = NewMatchPath
+            });
+    }
+
+    private async Task UpdateAsync()
+    {
+        await Dialog.CloseAsync<RouteDto>(Content);
+    }
+
+    private async Task CloseAsync()
+    {
+        await Dialog.CloseAsync<RouteDto>(Content);
+    }
+}

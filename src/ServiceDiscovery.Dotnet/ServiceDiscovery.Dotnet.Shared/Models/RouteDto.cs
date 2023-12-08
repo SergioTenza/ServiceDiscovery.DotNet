@@ -2,7 +2,8 @@
 
 public record RouteDto
 {
-    public required string RouteId {get;init;}
-    public required string ClusterId {get;init;}
-    public required string MatchPath {get;init;}
+    public string RouteId {get;set;}
+    public string ClusterId {get;set;}
+    public string MatchPath {get;set;}
+    public bool Selected {get;set;}
 }
