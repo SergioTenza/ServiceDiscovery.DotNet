@@ -1,0 +1,76 @@
+﻿@page "/gateway"
+@attribute [StreamRendering(true)]
+@attribute [OutputCache(Duration = 5)]
+
+@inject GatewayApiClient GatewayApi
+
+<PageTitle>Gateway</PageTitle>
+
+<h1>Gateway</h1>
+
+<div style="height: 434px; overflow:auto;" tabindex="-1">
+@if (routes is null || clusters is null)
+{
+    <p>Obtaining services please wait...</p>
+    <p><em>
+        <div style="width: 50%; display: grid; grid-gap: 12px; grid-auto-flow: column;">            
+            <FluentProgress></FluentProgress>
+             
+        </div>
+    </em></p>   
+}
+
+@if (routes is not null)
+{
+    <h2>Routes</h2>
+    if (routes.Length > 0)
+    {
+        <FluentDataGrid Items="@routes.AsQueryable()">
+            <PropertyColumn Property="@(p => p.RouteId)" Sortable="true" />
+            <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
+            <PropertyColumn Property="@(p => p.MatchPath)" Sortable="true" />
+            <TemplateColumn Title="Actions" Align="@Align.End">
+                <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))" />
+                <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
+            </TemplateColumn>
+        </FluentDataGrid>        
+        <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size16.Add())" OnClick="@(() => Console.WriteLine("Add clicked"))" />
+    }
+    else
+    {
+        
+    }
+}
+
+@if (clusters is not null)
+{
+     <h2>Clusters</h2>
+    if (clusters.Length > 0)
+    {
+        <FluentDataGrid Items="@clusters.AsQueryable()">
+            <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
+            <PropertyColumn Property="@(p => p.Destination)" Sortable="true" />
+            <PropertyColumn Property="@(p => p.Path)" Sortable="true" />
+            <TemplateColumn Title="Actions" Align="@Align.End">
+                <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))" />
+                <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
+            </TemplateColumn>
+        </FluentDataGrid>        
+    }
+    else
+    {
+        
+    }
+}
+</div>
+@code {
+    private RouteDto[]? routes;
+    private ClusterDto[]? clusters;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //await Task.Delay(1000);
+        routes = await GatewayApi.GetRoutesAsync();
+        clusters = await GatewayApi.GetClustersAsync();
+    }
+}

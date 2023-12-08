@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ServiceDiscovery.Dotnet.ServiceDefaults\ServiceDiscovery.Dotnet.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\ServiceDiscovery.Dotnet.Shared\ServiceDiscovery.Dotnet.Shared.csproj" />
   </ItemGroup>
 
 </Project>

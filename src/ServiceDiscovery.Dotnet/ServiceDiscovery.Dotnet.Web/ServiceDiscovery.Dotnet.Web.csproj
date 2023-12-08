@@ -9,10 +9,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ServiceDiscovery.Dotnet.ServiceDefaults\ServiceDiscovery.Dotnet.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\ServiceDiscovery.Dotnet.Shared\ServiceDiscovery.Dotnet.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.StackExchange.Redis.OutputCaching" Version="8.0.0-preview.1.23557.2" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.1.1" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.1.0" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.1.0" />
   </ItemGroup>
   
 </Project>
