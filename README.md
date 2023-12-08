@@ -1,2 +1,16 @@
 # ServiceDiscovery.DotNet
-docker-compose Full dotnet 8 stack ServiceDiscovery with WebUI + BackendServices + DB
+
+Full .net 8 stack service discovery using Aspire orchestration.
+
+- API gateway using YARP
+- Blazor Web UI to handle and create new services
+- postgres DB
+- Built in Telemetry and Logging
+
+## Deploy as Docker
+
+WIP
+
+## Build from source
+
+WIP
