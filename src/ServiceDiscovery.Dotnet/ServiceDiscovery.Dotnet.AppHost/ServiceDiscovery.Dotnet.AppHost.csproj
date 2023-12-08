@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ServiceDiscovery.Dotnet.ApiGateway\ServiceDiscovery.Dotnet.ApiGateway.csproj" />
     <ProjectReference Include="..\ServiceDiscovery.Dotnet.ApiService\ServiceDiscovery.Dotnet.ApiService.csproj" />
     <ProjectReference Include="..\ServiceDiscovery.Dotnet.Web\ServiceDiscovery.Dotnet.Web.csproj" />
   </ItemGroup>
