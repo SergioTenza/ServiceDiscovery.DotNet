@@ -1,16 +1,22 @@
 ﻿@page "/gateway"
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
 @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)]
 
 @inject GatewayApiClient GatewayApi
 @inject IDialogService DialogService
 
+@inject IState<RoutesState> RoutesState
+@inject IDispatcher Dispatcher
+
 <PageTitle>Gateway</PageTitle>
 
 <h1>Gateway</h1>
 
 <div style="height: 100%; overflow:visible;">
-@if (routes is null || clusters is null)
+@if (RoutesState?.Value?.Routes is null || clusters is null)
 {
     <p>Obtaining services please wait...</p>
     <p><em>
@@ -21,12 +27,12 @@
     </em></p>   
 }
 
-@if (routes is not null)
+@if (RoutesState?.Value?.Routes is not null)
 {
     <h2>Routes</h2>
-    if (routes.Length > 0)
+    if (RoutesState?.Value?.Routes.Any() ?? false)
     {
-        <FluentDataGrid Items="@routes.AsQueryable()">
+        <FluentDataGrid Items="@RoutesState.Value.Routes.AsQueryable()">
             <PropertyColumn Property="@(p => p.RouteId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.MatchPath)" Sortable="true" />
@@ -42,6 +48,18 @@
 @if (clusters is not null)
 {
      <h2>Clusters</h2>
+     if(routes?.Length > 0)
+    {
+        <div style="height: 100%;">
+            <FluentCombobox Style="margin-top: 10px;" Height="200px" Items=@routesCombo
+                OptionText="@(i => i.Text)" 
+                OptionValue="@(i => i.Value)" 
+                OptionSelected="@(i => i.Selected)"
+                @bind-SelectedOption="@selectedClusterOption"
+                @bind-Value="@clusterValue" />
+            <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditAsync(routes.Where(r => r.ClusterId == clusterValue).FirstOrDefault(),clusters.Where(c=> c.ClusterId == clusterValue)))" />
+        </div>        
+    }   
     if (clusters.Length > 0)
     {
         <FluentDataGrid Items="@clusters.AsQueryable()">
@@ -54,19 +72,7 @@
             </TemplateColumn>
         </FluentDataGrid>        
     }
-    if(routes?.Length > 0)
-    {
-        <div style="height: 100%;">
-            <FluentCombobox Style="margin-top: 10px;" Height="200px" Items=@routesCombo
-                OptionText="@(i => i.Text)" 
-                OptionValue="@(i => i.Value)" 
-                OptionSelected="@(i => i.Selected)"
-                @bind-SelectedOption="@selectedClusterOption"
-                @bind-Value="@clusterValue" />
-            <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditAsync(routes.Where(r => r.ClusterId == clusterValue).FirstOrDefault(),clusters.Where(c=> c.ClusterId == clusterValue)))" />
-        </div>
-        
-    }   
+    
 }
 </div>
 @code {
@@ -81,9 +87,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //await Task.Delay(1000);
+        await base.OnInitializedAsync();
         routes = await GatewayApi.GetRoutesAsync();
         clusters = await GatewayApi.GetClustersAsync();
+        Dispatcher.Dispatch(new FetchRoutesAction());        
     }
     private async Task OpenEditAsync(RouteDto? routeDto,IEnumerable<ClusterDto>? clusterDto = default)
     {
