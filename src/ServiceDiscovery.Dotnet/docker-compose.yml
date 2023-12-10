@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  redis-stack:
+    image: redis/redis-stack:latest
+    container_name: redis-stack
+    ports:
+      - 6379:6379
+      - 8001:8001
+    volumes:
+      - redis-data:/data
+    networks:
+        - rabbitmq_go_net
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - rabbitmq-data:/var/lib/rabbitmq/
+        - rabbitmq-logs:/var/log/rabbitmq
+    networks:
+        - rabbitmq_go_net
+
+volumes:
+  redis-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
+  rabbitmq-logs:
+    driver: local
+networks:
+  rabbitmq_go_net:
+    driver: bridge

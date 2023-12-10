@@ -1,4 +1,8 @@
 using System.Text.RegularExpressions;
+using MassTransit;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using ServiceDiscovery.Dotnet.ApiGateway;
 using ServiceDiscovery.Dotnet.Shared;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Model;
@@ -13,8 +17,23 @@ builder.AddServiceDefaults();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddReverseProxy()
-    .LoadFromMemory(GetRoutes(), GetClusters());
-
+    .LoadFromMemory([], [])
+    .LoadFromRedis(builder.Configuration);
+builder.Services.AddSingleton(new List<RouteConfig>());
+builder.Services.AddSingleton(new List<ClusterConfig>());
+builder.Services.AddMassTransit(x =>
+    {
+        x.SetKebabCaseEndpointNameFormatter();
+        x.AddConsumer<UpdateGatewayConsumer>();
+        x.UsingRabbitMq((context, cfg) =>
+        {
+            cfg.Host("localhost", "/", h =>
+            {
+                h.Username("guest");
+                h.Password("guest");
+            });
+        });
+    });
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -35,36 +54,16 @@ app.MapReverseProxy(proxyPipeline =>
     proxyPipeline.UseLoadBalancing();
 });
 
-app.MapGet("/routes", (InMemoryConfigProvider configProvider) =>
-{
-    Console.WriteLine("Received routes petition");
-    var routes = GetRoutes();
-    return routes.Length > 0 ? 
-        routes.Select(s=> new RouteDto
-        {
-            RouteId = s.RouteId,
-            ClusterId = s.ClusterId ?? string.Empty,
-            MatchPath = s.Match.Path ?? string.Empty
-        }) : 
-        Array.Empty<RouteDto>();
-});
-app.MapGet("/clusters", (InMemoryConfigProvider configProvider) =>
-{
-    Console.WriteLine("Received clusters petition");
-    var clusters = GetClusters();
-    return clusters.Length > 0 ? 
-        clusters.SelectMany(c => c?.Destinations?.Select(d => new ClusterDto
-        {
-            ClusterId = c.ClusterId,            
-            Destination = d.Key,
-            Path = d.Value.Address
-            
-        }) ?? Array.Empty<ClusterDto>()):
-        Array.Empty<ClusterDto>();
-} );
+
+app.MapGroup("/v1")
+    .Routes()
+    .Clusters();
+
+
 
 app.Map("/update", context =>
 {
+    //TODO: Move to get actual data from Redis
     context.RequestServices.GetRequiredService<InMemoryConfigProvider>().Update(GetRoutes(), GetClusters());
     return Task.CompletedTask;
 });
@@ -83,6 +82,7 @@ RouteConfig[] GetRoutes()
             {
                 // Path or Hosts are required for each route. This catch-all pattern matches all request paths.
                 Path = "{**catch-all}"
+                
             }
         }
     ];
@@ -132,3 +132,5 @@ Task CustomProxyStep(HttpContext context, Func<Task> next)
     // Important - required to move to the next step in the proxy pipeline
     return next();
 }
+
+

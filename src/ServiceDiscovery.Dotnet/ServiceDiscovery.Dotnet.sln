@@ -14,6 +14,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceDiscovery.Dotnet.Api
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDiscovery.Dotnet.Shared", "ServiceDiscovery.Dotnet.Shared\ServiceDiscovery.Dotnet.Shared.csproj", "{097CD0B6-D2B0-41B8-A048-3557EA6386AE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Development_Infraestructure", "Development_Infraestructure", "{AAE9A63B-2154-418A-BFD9-4E3B47AA1C0D}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

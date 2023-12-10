@@ -35,7 +35,7 @@
         <FluentDataGrid Items="@RoutesState.Value.Routes.AsQueryable()">
             <PropertyColumn Property="@(p => p.RouteId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
-            <PropertyColumn Property="@(p => p.MatchPath)" Sortable="true" />
+            @* <PropertyColumn Property="@(p => p.MatchPath)" Sortable="true" /> *@
             <TemplateColumn Title="Actions" Align="@Align.End">
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="()=> OpenEditAsync(context)" />
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="()=>DeleteRouteAsync(context)" />
@@ -65,7 +65,7 @@
         <FluentDataGrid Items="@clusters.AsQueryable()">
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.Destination)" Sortable="true" />
-            <PropertyColumn Property="@(p => p.Path)" Sortable="true" />
+            @* <PropertyColumn Property="@(p => p.Path)" Sortable="true" /> *@
             <TemplateColumn Title="Actions" Align="@Align.End">
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))" />
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
@@ -112,7 +112,7 @@
                                             : r with 
                                             {
                                                 ClusterId = data.ClusterId,
-                                                MatchPath = data.MatchPath
+                                                //MatchPath = data.MatchPath
                                             })
                                             .ToArray();
             StateHasChanged();

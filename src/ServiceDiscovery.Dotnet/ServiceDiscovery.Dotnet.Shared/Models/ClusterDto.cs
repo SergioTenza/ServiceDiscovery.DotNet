@@ -2,7 +2,7 @@
 
 public record ClusterDto
 {
-    public required string ClusterId {get;init;}
-    public required string Destination {get;init;}
-    public required string Path {get;init;}
+    public string ClusterId { get; set; } = string.Empty;
+    public SessionAffinityDto sessionAffinity { get; set; } = new();
+    public Dictionary<string, DestinationConfigDto> Destination { get; set; } = new Dictionary<string, DestinationConfigDto>(StringComparer.OrdinalIgnoreCase);
 }

@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject IBus Bus
 
 <PageTitle>Home</PageTitle>
 
@@ -8,8 +9,17 @@
 </FluentCard>
 
 
-@code{
-  void Click(){
+@code {
+  async Task Click()
+  {
     Console.WriteLine("Clicked");
+    try
+    {
+      await Bus.Publish(new UpdateGateway());
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine("Clicked");
+    }
   }
 }

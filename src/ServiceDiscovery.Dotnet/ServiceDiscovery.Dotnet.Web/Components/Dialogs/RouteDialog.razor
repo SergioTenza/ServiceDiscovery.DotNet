@@ -26,7 +26,7 @@
 
 @* Body *@
 <FluentDialogBody>
-    <FluentStack Orientation="Orientation.Vertical">
+    @* <FluentStack Orientation="Orientation.Vertical">
         @if (Content is not null)
         {
             <FluentTextField @bind-Value="@Content.ClusterId">ClusterId:</FluentTextField>
@@ -39,7 +39,7 @@
             <FluentTextField @bind-Value="@NewMatchPath">MatchPath:</FluentTextField>
         }
 
-    </FluentStack>
+    </FluentStack> *@
 </FluentDialogBody>
 
 @code {
@@ -59,7 +59,7 @@
             { 
                 RouteId = NewRouteId,
                 ClusterId = NewClusterId,
-                MatchPath = NewMatchPath
+                //MatchPath = NewMatchPath
             });
     }
 
