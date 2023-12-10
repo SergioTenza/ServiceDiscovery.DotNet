@@ -26,20 +26,20 @@
 
 @* Body *@
 <FluentDialogBody>
-    @* <FluentStack Orientation="Orientation.Vertical">
+    <FluentStack Orientation="Orientation.Vertical">
         @if (Content is not null)
         {
             <FluentTextField @bind-Value="@Content.ClusterId">ClusterId:</FluentTextField>
-            <FluentTextField @bind-Value="@Content.MatchPath">MatchPath:</FluentTextField>
+            <FluentTextField @bind-Value="@Content.Match.Path">Path:</FluentTextField>
         }
         else
         {
             <FluentTextField @bind-Value="@NewRouteId">RouteId:</FluentTextField>
             <FluentTextField @bind-Value="@NewClusterId">ClusterId:</FluentTextField>
-            <FluentTextField @bind-Value="@NewMatchPath">MatchPath:</FluentTextField>
+            <FluentTextField @bind-Value="@NewMatchPath">Path:</FluentTextField>
         }
 
-    </FluentStack> *@
+    </FluentStack>
 </FluentDialogBody>
 
 @code {
@@ -52,14 +52,33 @@
     string NewRouteId = string.Empty;
     string NewClusterId = string.Empty;
     string NewMatchPath = string.Empty;
-    
+
+
+    protected override Task OnParametersSetAsync()
+    {
+        if(Content is not null)
+        {
+            if(string.IsNullOrEmpty(Content.ClusterId))
+            {
+                Content.ClusterId = string.Empty;
+            }
+            if(Content.Match is null)
+            {
+                Content.Match = new MatchDto
+                {
+                    Path = string.Empty
+                };
+            }
+        }
+        return base.OnParametersSetAsync();
+    }
     private async Task SaveAsync()
     {
-        await Dialog.CloseAsync<RouteDto>(new RouteDto 
-            { 
+        await Dialog.CloseAsync<RouteDto>(new RouteDto
+            {
                 RouteId = NewRouteId,
                 ClusterId = NewClusterId,
-                //MatchPath = NewMatchPath
+                Match = new MatchDto{ Path = NewMatchPath }
             });
     }
 

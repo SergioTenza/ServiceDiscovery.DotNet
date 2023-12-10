@@ -1,4 +1,5 @@
-﻿using ServiceDiscovery.Dotnet.Shared;
+﻿using Microsoft.AspNetCore.Mvc;
+using ServiceDiscovery.Dotnet.Shared;
 using Yarp.ReverseProxy.Configuration;
 
 namespace ServiceDiscovery.Dotnet.ApiGateway;
@@ -7,14 +8,14 @@ public static class ClustersGroup
 {
     public static RouteGroupBuilder Clusters(this RouteGroupBuilder builder)
     {
-        builder.MapGet("/clusters", (List<ClusterConfig> clusters) =>
-            clusters.ToArray());
+        builder.MapGet("/clusters", () => Array.Empty<ClusterConfig>());
 
-        builder.MapGet("/clusters/{clusterId}", (string clusterId, List<ClusterConfig> routes) =>
-            routes.Where(r => r.ClusterId == clusterId) switch
+        builder.MapGet("/clusters/{clusterId}", (string clusterId) =>
+            new List<RouteConfig>().Where(r => r.ClusterId == clusterId) switch
             {
                 IEnumerable<ClusterConfig> clusters => Results.Ok(),
-                null => Results.NotFound()
+                null => Results.NotFound(),
+                _ => Results.NotFound()
             }
         );
         // builder.MapPost("/clusters", (

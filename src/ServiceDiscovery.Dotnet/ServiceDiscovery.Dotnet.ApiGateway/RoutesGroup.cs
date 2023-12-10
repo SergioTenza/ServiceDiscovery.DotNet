@@ -8,7 +8,7 @@ public static class RoutesGroup
 {
     public static RouteGroupBuilder Routes(this RouteGroupBuilder builder)
     {
-        builder.MapGet("/routes", (List<RouteConfig> routes) =>
+        builder.MapGet("/routes", ([FromServices]List<RouteConfig> routes) =>
             routes.ToArray());
 
         // builder.MapGet("/routes/{routeId}", (string routeId, List<RouteConfig> routes) =>
@@ -24,10 +24,10 @@ public static class RoutesGroup
         //     }
         // );
         builder.MapPost("/routes", (
-            RouteDto routeDto,
-            List<RouteConfig> routes,
-            List<ClusterConfig> clusters,
-            InMemoryConfigProvider configProvider) =>
+            [FromBody]RouteDto routeDto,
+            [FromServices]List<RouteConfig> routes,
+            [FromServices]List<ClusterConfig> clusters,
+            [FromServices]InMemoryConfigProvider configProvider) =>
                 routes.Any(r => r.RouteId == routeDto.RouteId) switch
                 {
                     true => Results.Conflict(),

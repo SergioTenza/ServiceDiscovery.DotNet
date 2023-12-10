@@ -12,14 +12,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddRedisOutputCache("cache");
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
 {
-	_ = builder.AddServiceDefaults();
-	_ = builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://gateway/v1"));
+	builder.AddServiceDefaults();
+	builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://gateway/v1"));
 }
 else
 {
-	_ = builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
-	_ = builder.Services.AddHttpClient("Gateway", client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
-	_ = builder.Services.AddMassTransit(x =>
+	builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
+	builder.Services.AddHttpClient("Gateway", client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
+	builder.Services.AddMassTransit(x =>
 	{
 		x.SetKebabCaseEndpointNameFormatter();
 		x.UsingRabbitMq((context, cfg) =>
@@ -57,10 +57,10 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
+app.UseOutputCache();
 if (!app.Environment.IsDevelopment())
 {
-	_ = app.UseOutputCache();
-	_ = app.MapDefaultEndpoints();
+	app.MapDefaultEndpoints();
 }
 
 app.Run();

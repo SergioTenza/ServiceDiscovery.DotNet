@@ -9,6 +9,7 @@
 @inject IDialogService DialogService
 
 @inject IState<RoutesState> RoutesState
+@inject IState<ClustersState> ClustersState
 @inject IDispatcher Dispatcher
 
 <PageTitle>Gateway</PageTitle>
@@ -16,13 +17,12 @@
 <h1>Gateway</h1>
 
 <div style="height: 100%; overflow:visible;">
-@if (RoutesState?.Value?.Routes is null || clusters is null)
+@if (RoutesState?.Value?.Routes is null)
 {
     <p>Obtaining services please wait...</p>
     <p><em>
         <div style="width: 50%; display: grid; grid-gap: 12px; grid-auto-flow: column;">            
-            <FluentProgress></FluentProgress>
-             
+            <FluentProgress></FluentProgress>             
         </div>
     </em></p>   
 }
@@ -30,12 +30,16 @@
 @if (RoutesState?.Value?.Routes is not null)
 {
     <h2>Routes</h2>
+    if(!RoutesState.Value.Routes.Any())
+    {
+        <h3>No routes found. Why don´t you create your first route?</h3>
+    }
     if (RoutesState?.Value?.Routes.Any() ?? false)
     {
         <FluentDataGrid Items="@RoutesState.Value.Routes.AsQueryable()">
             <PropertyColumn Property="@(p => p.RouteId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
-            @* <PropertyColumn Property="@(p => p.MatchPath)" Sortable="true" /> *@
+            <PropertyColumn Property="@(p => p.Match.Path)" Sortable="true" />
             <TemplateColumn Title="Actions" Align="@Align.End">
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="()=> OpenEditAsync(context)" />
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="()=>DeleteRouteAsync(context)" />
@@ -45,52 +49,66 @@
     <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditAsync(new RouteDto()))" />
 }
 
-@if (clusters is not null)
+
+<h2>Clusters</h2>
+<div style="height: 400px;">
+    <FluentCombobox Style="margin-top: 10px;" Height="200px" Items=@routesCombo
+        OptionText="@(i => i.Text)" 
+        OptionValue="@(i => i.Value)" 
+        OptionSelected="@(i => i.Selected)"
+        @bind-SelectedOption="@selectedClusterOption"
+        @bind-Value="@clusterValue" />
+    <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditAsync(RoutesState?.Value?.Routes.Where(r => r.ClusterId == clusterValue).FirstOrDefault(),ClustersState.Value.Clusters.Where(c=> c.ClusterId == clusterValue)))" />
+</div>      
+@if(!ClustersState?.Value?.Clusters.Any() ?? false)
 {
-     <h2>Clusters</h2>
-     if(routes?.Length > 0)
-    {
-        <div style="height: 100%;">
-            <FluentCombobox Style="margin-top: 10px;" Height="200px" Items=@routesCombo
-                OptionText="@(i => i.Text)" 
-                OptionValue="@(i => i.Value)" 
-                OptionSelected="@(i => i.Selected)"
-                @bind-SelectedOption="@selectedClusterOption"
-                @bind-Value="@clusterValue" />
-            <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditAsync(routes.Where(r => r.ClusterId == clusterValue).FirstOrDefault(),clusters.Where(c=> c.ClusterId == clusterValue)))" />
-        </div>        
-    }   
-    if (clusters.Length > 0)
-    {
-        <FluentDataGrid Items="@clusters.AsQueryable()">
+    <h3>No clusters found.</h3>
+}
+
+
+
+@if(ClustersState?.Value?.Clusters.Any() ?? false)
+{
+        <FluentDataGrid Items="@ClustersState?.Value?.Clusters.AsQueryable()">
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.Destination)" Sortable="true" />
-            @* <PropertyColumn Property="@(p => p.Path)" Sortable="true" /> *@
+            <PropertyColumn Property="@(p => p.sessionAffinity)" Sortable="true" />
             <TemplateColumn Title="Actions" Align="@Align.End">
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))" />
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
             </TemplateColumn>
         </FluentDataGrid>        
-    }
-    
 }
 </div>
 @code {
-    private RouteDto[]? routes;
-    private ClusterDto[]? clusters;
     RouteDto? DialogData { get; set; }
     bool canceled;
 
     string? clusterValue;
     Option<string> selectedClusterOption = default!;
-    private IEnumerable<Option<string>> routesCombo => routes is not null && routes.Length > 0 ? routes.Select(x=> new Option<string> { Value = x.ClusterId, Text = x.ClusterId }) : [];
+
+    private Func<IEnumerable<RouteDto>,IEnumerable<Option<string>>> GetComboOptions = (routes) =>
+        {
+            var response = routes.Any() ? routes.Select(x=> new Option<string> { Value = x.ClusterId, Text = x.ClusterId,Selected = false }) : [new Option<string> {Value = "no route found",Text = "no route found", Selected =  true}];
+            if(response.Any())
+            {
+                
+                response.Last().Selected = true;
+            }
+            return response;
+        };
+    private IEnumerable<Option<string>> routesCombo => RoutesState?.Value?.Routes switch
+        {
+            IEnumerable<RouteDto> routes => GetComboOptions(routes),
+            _ => [new Option<string> {Value = "no route found",Text = "no route found", Selected =  true}]
+        };
+
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-        routes = await GatewayApi.GetRoutesAsync();
-        clusters = await GatewayApi.GetClustersAsync();
+        await base.OnInitializedAsync();        
         Dispatcher.Dispatch(new FetchRoutesAction());        
+        Dispatcher.Dispatch(new FetchClustersAction());        
     }
     private async Task OpenEditAsync(RouteDto? routeDto,IEnumerable<ClusterDto>? clusterDto = default)
     {
@@ -107,12 +125,12 @@
 
             var result = await dialog.Result;
             var data = result.Data as RouteDto;
-            routes = routes?.Select(r => r.RouteId != data?.RouteId 
+            var routes = RoutesState?.Value?.Routes?.Select(r => r.RouteId != data?.RouteId 
                                             ? r 
                                             : r with 
                                             {
                                                 ClusterId = data.ClusterId,
-                                                //MatchPath = data.MatchPath
+                                                Match = new MatchDto{ Path = data.Match.Path }
                                             })
                                             .ToArray();
             StateHasChanged();
@@ -131,10 +149,8 @@
             var data = result.Data as RouteDto;
             if(data is not null)
             {
-                routes = routes?.Select(x => x).Append(data).ToArray();
-                StateHasChanged();
+                Dispatcher.Dispatch(new AddRouteAction{ RouteDto = data });
             }
-            
         }
         await Task.CompletedTask;
         
@@ -146,8 +162,8 @@
         canceled = result.Cancelled;
         if(!canceled)
         {
-            routes = routes?.Where(r=> r.RouteId != routeDto?.RouteId).ToArray();
-            clusters = clusters?.Where(r=> r.ClusterId != routeDto?.ClusterId).ToArray();
+            var routes = RoutesState?.Value?.Routes?.Where(r=> r.RouteId != routeDto?.RouteId).ToArray();
+            var clusters = ClustersState?.Value?.Clusters?.Where(r=> r.ClusterId != routeDto?.ClusterId).ToArray();
             StateHasChanged();
         }
     }

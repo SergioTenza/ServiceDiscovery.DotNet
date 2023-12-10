@@ -3,29 +3,52 @@ using ServiceDiscovery.Dotnet.Shared;
 
 namespace ServiceDiscovery.Dotnet.Web;
 
-public class GatewayApiClient(HttpClient httpClient, IHttpClientFactory httpClientFactory)
+public class GatewayApiClient(IHttpClientFactory httpClientFactory)
 {
-	private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly IHttpClientFactory httpClientFactory = httpClientFactory;
 
-	public async Task<RouteDto[]> GetRoutesAsync()
-	{
-		return await httpClient.GetFromJsonAsync<RouteDto[]>("/routes").ConfigureAwait(false) ?? [];
-	}
-
-	public async Task<ClusterDto[]> GetClustersAsync()
-	{
-		return await httpClient.GetFromJsonAsync<ClusterDto[]>("/clusters").ConfigureAwait(false) ?? [];
-	}
-
-	[EffectMethod]
+    [EffectMethod]
 	public async Task HandleFetchRoutesAction(FetchRoutesAction action, IDispatcher dispatcher)
 	{
-		var httpClient = _httpClientFactory.CreateClient("Gateway");
+		var httpClient = httpClientFactory.CreateClient("Gateway");
 		if (httpClient is not null)
 		{
-			var routes = await httpClient.GetFromJsonAsync<RouteDto[]>("/routes").ConfigureAwait(false) ?? [];
-			ArgumentNullException.ThrowIfNull(dispatcher);
-			dispatcher.Dispatch(new FetchRoutesResultAction(routes));
+			try
+			{
+				var routes = await httpClient.GetFromJsonAsync<RouteDto[]>("/routes") ?? [];	
+				ArgumentNullException.ThrowIfNull(dispatcher);
+				dispatcher.Dispatch(new FetchRoutesResultAction(routes));
+				await Task.CompletedTask;
+			}
+			catch(Exception ex)
+			{				
+				Console.WriteLine(ex.Message);
+				ArgumentNullException.ThrowIfNull(dispatcher);
+				dispatcher.Dispatch(new FetchRoutesResultAction([]));
+				await Task.CompletedTask;
+			}
+		}
+	}
+	[EffectMethod]
+	public async Task HandleFetchClustersAction(FetchClustersAction action, IDispatcher dispatcher)
+	{
+		var httpClient = httpClientFactory.CreateClient("Gateway");
+		if (httpClient is not null)
+		{
+			try
+			{
+				var clusters = await httpClient.GetFromJsonAsync<ClusterDto[]>("/clusters") ?? [];	
+				ArgumentNullException.ThrowIfNull(dispatcher);
+				dispatcher.Dispatch(new FetchClustersResultAction(clusters));
+			}
+			catch(Exception ex)
+			{
+					Console.WriteLine(ex.Message);
+				ArgumentNullException.ThrowIfNull(dispatcher);
+				dispatcher.Dispatch(new FetchClustersResultAction([]));
+				await Task.CompletedTask;
+
+			}
 		}
 	}
 }
