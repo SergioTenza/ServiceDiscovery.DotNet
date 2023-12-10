@@ -12,38 +12,34 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddRedisOutputCache("cache");
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
 {
-    builder.AddServiceDefaults();
-    
-    builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://gateway/v1"));
+	_ = builder.AddServiceDefaults();
+	_ = builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://gateway/v1"));
 }
 else
 {
-    builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
-    builder.Services.AddHttpClient("Gateway", client =>
-    {
-        client.BaseAddress = new("http://127.0.0.1:5024/v1");
-    });
-    builder.Services.AddMassTransit(x =>
-    {
-        x.SetKebabCaseEndpointNameFormatter();
-        x.UsingRabbitMq((context, cfg) =>
-        {
-            cfg.Host("localhost", "/", h =>
-            {
-                h.Username("guest");
-                h.Password("guest");
-            });
-        });
-    });
+	_ = builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
+	_ = builder.Services.AddHttpClient("Gateway", client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
+	_ = builder.Services.AddMassTransit(x =>
+	{
+		x.SetKebabCaseEndpointNameFormatter();
+		x.UsingRabbitMq((context, cfg) =>
+		{
+			cfg.Host("localhost", "/", h =>
+			{
+				h.Username("guest");
+				h.Password("guest");
+			});
+		});
+	});
 }
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+	.AddInteractiveServerComponents();
 
 // Fluxor State
 builder.Services.AddFluxor(options =>
-    options.ScanAssemblies(typeof(Program).Assembly, new[] { typeof(BaseState).Assembly })
+    options.ScanAssemblies(typeof(Program).Assembly, [typeof(BaseState).Assembly])
 );
 // FluentUI
 builder.Services.AddFluentUIComponents();
@@ -51,7 +47,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.MapDefaultEndpoints();
+	_ = app.MapDefaultEndpoints();
 }
 
 app.UseStaticFiles();
@@ -63,8 +59,8 @@ app.MapRazorComponents<App>()
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseOutputCache();
-    app.MapDefaultEndpoints();
+	_ = app.UseOutputCache();
+	_ = app.MapDefaultEndpoints();
 }
 
 app.Run();

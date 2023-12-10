@@ -1,13 +1,17 @@
 ﻿@inherits LayoutComponentBase
 
 <Fluxor.Blazor.Web.StoreInitializer/>
+
 <div style="height: 100%;">
     <FluentMainLayout NavMenuTitle="Navigation menu">
         <Header>
             <h3>ServiceDiscovery.Dotnet</h3>
+			<FluentSpacer/>
+			<NotificationCenter/>
         </Header>
 
         <Body>
+			<FluentMessageBarProvider />
             @Body
         </Body>
         <NavMenuContent>
@@ -20,7 +24,7 @@
     <FluentToastProvider />
     <FluentDialogProvider  @rendermode="@InteractiveServer"  />
     <FluentTooltipProvider />
-    <FluentMessageBarProvider />
+   
 </div>
 <div id="blazor-error-ui">
     An unhandled error has occurred.

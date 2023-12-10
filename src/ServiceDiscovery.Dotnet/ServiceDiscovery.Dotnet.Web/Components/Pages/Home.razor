@@ -1,26 +1,38 @@
-﻿@page "/"
-@inject IBus Bus
+﻿@inject IMessageService MessageService
+
+
+@page "/"
 
 <PageTitle>Home</PageTitle>
 
 <FluentCard>
-  <h2>Hello World!</h2>
-  <FluentButton Appearance="@Appearance.Accent" OnClick="Click">Click Me</FluentButton>
+  <h2>Welcome to your ServiceDiscovery and API Gateway management dashboard<br/>Built with dotnet 8 and Aspire Framework</h2>  
+  <FluentButton OnClick="@AddInNotificationCenter" Appearance="Appearance.Accent">Add on top</FluentButton>
 </FluentCard>
-
-
-@code {
-  async Task Click()
-  {
-    Console.WriteLine("Clicked");
-    try
-    {      
-      await Bus.Publish(new UpdateGateway());
-      Console.WriteLine("UpdateGateway sent");
-    }
-    catch (Exception ex)
+@code{
+	int counter = 0;
+	ActionLink<Message> link = new()
+        {
+            Text = "Learn more",
+            Href = "https://bing.com",
+            OnClick = (e) => { Console.WriteLine($"Message 'learn more' clicked"); return Task.CompletedTask; }
+        };
+	void AddInTopBar()
     {
-      Console.WriteLine(ex.Message);
+        var message = $"Simple message #{counter++}";
+        var type = Enum.GetValues<MessageIntent>()[counter % 4];
+        MessageService.ShowMessageBarAsync(message, type, "TOP");
+    }	
+	void AddInNotificationCenter()
+    {
+        MessageService.ShowMessageBar(options =>
+        {
+            options.Intent = Enum.GetValues<MessageIntent>()[counter % 4];
+            options.Title = $"Simple message #{counter++}";
+            options.Body = "TEST MESSAGE";
+            options.Link = link;
+            options.Timestamp = DateTime.Now;
+            options.Section = "NOTIFICATION_CENTER";
+        });
     }
-  }
 }

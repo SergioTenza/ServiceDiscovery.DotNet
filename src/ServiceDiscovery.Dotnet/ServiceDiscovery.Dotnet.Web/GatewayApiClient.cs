@@ -3,49 +3,29 @@ using ServiceDiscovery.Dotnet.Shared;
 
 namespace ServiceDiscovery.Dotnet.Web;
 
-public class GatewayApiClient(HttpClient httpClient,IHttpClientFactory httpClientFactory)
+public class GatewayApiClient(HttpClient httpClient, IHttpClientFactory httpClientFactory)
 {
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+	private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
-    public async Task<RouteDto[]> GetRoutesAsync()
-    {
-        try
-        {
-            return await httpClient.GetFromJsonAsync<RouteDto[]>("/routes") ?? [];
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return [];
-        }
+	public async Task<RouteDto[]> GetRoutesAsync()
+	{
+		return await httpClient.GetFromJsonAsync<RouteDto[]>("/routes").ConfigureAwait(false) ?? [];
+	}
 
-    }
-    public async Task<ClusterDto[]> GetClustersAsync()
-    {
-        try
-        {
-            return await httpClient.GetFromJsonAsync<ClusterDto[]>("/clusters") ?? [];
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return [];
-        }
-    }
-    [EffectMethod]
-    public async Task HandleFetchRoutesAction(FetchRoutesAction action, IDispatcher dispatcher)
-    {
+	public async Task<ClusterDto[]> GetClustersAsync()
+	{
+		return await httpClient.GetFromJsonAsync<ClusterDto[]>("/clusters").ConfigureAwait(false) ?? [];
+	}
 
-        try
-        {             
-            var httpClient = _httpClientFactory.CreateClient("Gateway");            
-            var routes = await httpClient.GetFromJsonAsync<RouteDto[]>("/routes") ?? [];
-            dispatcher.Dispatch(new FetchRoutesResultAction(routes));
-        }
-        catch (Exception ex)
-        {
-
-            Console.WriteLine(ex.Message);
-        }
-    }
+	[EffectMethod]
+	public async Task HandleFetchRoutesAction(FetchRoutesAction action, IDispatcher dispatcher)
+	{
+		var httpClient = _httpClientFactory.CreateClient("Gateway");
+		if (httpClient is not null)
+		{
+			var routes = await httpClient.GetFromJsonAsync<RouteDto[]>("/routes").ConfigureAwait(false) ?? [];
+			ArgumentNullException.ThrowIfNull(dispatcher);
+			dispatcher.Dispatch(new FetchRoutesResultAction(routes));
+		}
+	}
 }
