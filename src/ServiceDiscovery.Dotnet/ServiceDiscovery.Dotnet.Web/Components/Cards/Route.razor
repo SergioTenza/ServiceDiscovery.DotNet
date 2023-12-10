@@ -1,0 +1,24 @@
+﻿<FluentGridItem xs="12" sm="3" Style="padding: 10px;">
+	<div class="card">
+		<FluentLayout Style="background-color: var(--neutral-layer-1);margin-top: 10px;padding: 10px;">
+			<FluentHeader>@RouteDto?.RouteId</FluentHeader>
+			<FluentBodyContent>
+				<p>Cluster: @RouteDto?.ClusterId</p>
+				<p>Path: @RouteDto?.Match.Path</p>
+				<FluentDivider Orientation="Orientation.Horizontal"></FluentDivider>
+				<p>Hosts:</p>
+				@foreach(var host in @RouteDto?.Match?.Hosts ?? [])
+				{
+					<p>@host</p>
+				}
+				
+			</FluentBodyContent>
+		</FluentLayout>
+	</div>
+</FluentGridItem>
+
+@code {
+	[Parameter]
+	public RouteDto? RouteDto {get;set;}
+
+}

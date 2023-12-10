@@ -11,7 +11,7 @@ public static class GatewayExtensions
 		new()
 		{
 			ClusterId = clusterDto.ClusterId,
-			SessionAffinity = clusterDto.sessionAffinity.ToSessionAffinityConfig(),
+			SessionAffinity = clusterDto.SessionAffinity.ToSessionAffinityConfig(),
 			Destinations = clusterDto.Destination.ToSessionAffinityConfig()
 		};
 
@@ -41,7 +41,7 @@ public static class GatewayExtensions
 		new()
 		{
 			ClusterId = clusterConfig.ClusterId,
-			sessionAffinity = clusterConfig?.SessionAffinity?.ToSessionAffinityDto() ?? new SessionAffinityDto(),
+			SessionAffinity = clusterConfig?.SessionAffinity?.ToSessionAffinityDto() ?? new SessionAffinityDto(),
 			Destination = clusterConfig?.Destinations?.ToDestinationConfigDto() ?? []
 		};
 

@@ -1,6 +1,6 @@
 ﻿namespace ServiceDiscovery.Dotnet.Shared;
 
-public record SessionAffinityDto
+public class SessionAffinityDto
 {
     public bool Enabled {get;set;} = true;
     public string Policy {get;set;} = "Cookie";

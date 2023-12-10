@@ -23,10 +23,7 @@ builder.Services.AddReverseProxy()
 //builder.Services.AddSingleton(new List<RouteConfig>());
 //builder.Services.AddSingleton(new List<ClusterConfig>());
 
-builder.Services.AddSingleton(services =>
-{
-    return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("cache")!);
-});
+builder.Services.AddSingleton(services => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("cache")!));
 builder.Services.AddMassTransit(x =>
     {
         x.SetKebabCaseEndpointNameFormatter();

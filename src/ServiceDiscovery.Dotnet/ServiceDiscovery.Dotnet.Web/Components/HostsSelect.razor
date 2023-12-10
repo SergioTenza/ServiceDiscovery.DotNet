@@ -1,0 +1,13 @@
+﻿ <FluentCombobox Style="margin-top: 10px;" Height="200px" Items=@Hosts
+        OptionText="@(i => i.Text)" 
+        OptionValue="@(i => i.Value)" 
+        OptionSelected="@(i => i.Selected)"
+        @bind-SelectedOption="@selectedHostOption"
+        @bind-Value="@hostValue" />
+
+@code {
+    [Parameter]
+    public IEnumerable<Option<string>> Hosts {get; set;} = [];
+    private Option<string> selectedHostOption {get;set;}
+    private string hostValue {get;set;}
+}

@@ -1,0 +1,97 @@
+﻿@implements IDialogContentComponent<IEnumerable<ClusterDto>>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    @if (Content is null || !Content.Any())
+    {
+        <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Create</FluentButton>
+    }
+    else
+    {
+        <FluentButton Appearance="Appearance.Accent" OnClick="@UpdateAsync">Update</FluentButton>
+    }
+
+    <FluentButton Appearance="Appearance.Accent" OnClick="@CloseAsync">Close</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentStack Orientation="Orientation.Vertical">
+        @if (Content is not null)
+        {
+            foreach (var cluster in Content)
+            {
+                <FluentTextField @bind-Value="@cluster.ClusterId">ClusterId:</FluentTextField>
+                <FluentLabel>SessionAffinity</FluentLabel>
+                <FluentSwitch @bind-Value="@cluster.SessionAffinity.Enabled" Label="Enabled:"/>
+                <div>
+                    <FluentTextField @bind-Value="@cluster.SessionAffinity.Policy">Policy:</FluentTextField>    
+                </div>
+                <div>
+                    <FluentTextField @bind-Value="@cluster.SessionAffinity.AffinityKeyName">AffinityKeyName:</FluentTextField>
+                </div>                
+                <FluentLabel>Destinations</FluentLabel>
+                <FluentDataGrid Items="@cluster.Destination.AsQueryable()">
+                    <PropertyColumn Property="@(p => p.Key)" Sortable="true" />
+                    <PropertyColumn Property="@(p => p.Value.Address)" Sortable="true" />
+                </FluentDataGrid>
+            }
+
+        }
+        else
+        {
+            <FluentTextField @bind-Value="@ClusterId">ClusterId:</FluentTextField>
+            <FluentLabel>SessionAffinity</FluentLabel>
+            <FluentSwitch @bind-Value="@sessionAffinityDto.Enabled" Label="Enabled:" />
+            <FluentStack Orientation="Orientation.Horizontal">
+                <FluentTextField @bind-Value="@sessionAffinityDto.Policy">Policy:</FluentTextField>
+                <FluentTextField @bind-Value="@sessionAffinityDto.AffinityKeyName">AffinityKeyName:</FluentTextField>
+            </FluentStack>
+            <FluentLabel>Destination</FluentLabel>
+            <FluentDataGrid Items="@Destinations.AsQueryable()">
+                <PropertyColumn Property="@(p => p.Key)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.Value.Address)" Sortable="true" />
+            </FluentDataGrid>
+        }
+
+    </FluentStack>
+</FluentDialogBody>
+
+@code {
+    [Parameter]
+    public IEnumerable<ClusterDto> Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    private string ClusterId { get; set; } = string.Empty;
+    private SessionAffinityDto sessionAffinityDto = new();
+    private DestinationConfigDto destinationConfigDto = new();
+    private Dictionary<string, DestinationConfigDto> Destinations { get; set; } = new Dictionary<string,
+    DestinationConfigDto>(StringComparer.OrdinalIgnoreCase);
+
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync<IEnumerable<ClusterDto>>([]);
+    }
+
+    private async Task UpdateAsync()
+    {
+        await Dialog.CloseAsync<IEnumerable<ClusterDto>>([]);
+    }
+
+    private async Task CloseAsync()
+    {
+        await Dialog.CloseAsync<IEnumerable<ClusterDto>>([]);
+    }
+}
