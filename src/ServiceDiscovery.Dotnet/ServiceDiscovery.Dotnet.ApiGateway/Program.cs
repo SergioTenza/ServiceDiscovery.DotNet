@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ServiceDiscovery.Dotnet.ApiGateway;
 using ServiceDiscovery.Dotnet.Shared;
+using StackExchange.Redis;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Model;
 
@@ -17,14 +18,20 @@ builder.AddServiceDefaults();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddReverseProxy()
-    .LoadFromMemory([], [])
+    //.LoadFromMemory([], [])
     .LoadFromRedis(builder.Configuration);
-builder.Services.AddSingleton(new List<RouteConfig>());
-builder.Services.AddSingleton(new List<ClusterConfig>());
+//builder.Services.AddSingleton(new List<RouteConfig>());
+//builder.Services.AddSingleton(new List<ClusterConfig>());
+
+builder.Services.AddSingleton(services =>
+{
+    return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("cache")!);
+});
 builder.Services.AddMassTransit(x =>
     {
         x.SetKebabCaseEndpointNameFormatter();
-        x.AddConsumer<UpdateGatewayConsumer>();
+        var assembly = typeof(Program).Assembly;
+        x.AddConsumers(assembly);
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.Host("localhost", "/", h =>
@@ -32,7 +39,8 @@ builder.Services.AddMassTransit(x =>
                 h.Username("guest");
                 h.Password("guest");
             });
-        });
+            cfg.ConfigureEndpoints(context);
+        });        
     });
 var app = builder.Build();
 

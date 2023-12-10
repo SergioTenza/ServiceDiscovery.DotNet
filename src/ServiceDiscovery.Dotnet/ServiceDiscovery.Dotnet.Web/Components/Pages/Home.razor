@@ -14,12 +14,13 @@
   {
     Console.WriteLine("Clicked");
     try
-    {
+    {      
       await Bus.Publish(new UpdateGateway());
+      Console.WriteLine("UpdateGateway sent");
     }
     catch (Exception ex)
     {
-      Console.WriteLine("Clicked");
+      Console.WriteLine(ex.Message);
     }
   }
 }

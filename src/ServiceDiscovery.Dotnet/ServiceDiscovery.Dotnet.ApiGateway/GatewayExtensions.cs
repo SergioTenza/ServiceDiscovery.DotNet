@@ -92,5 +92,29 @@ public static class GatewayExtensions
         builder.Services.AddSingleton((Func<IServiceProvider, IProxyConfigProvider>)((IServiceProvider s) => s.GetRequiredService<InMemoryConfigProvider>()));
         return builder;
     }
-    
+    public static (IReadOnlyList<RouteConfig> routes,IReadOnlyList<ClusterConfig> clusters) GetProxyFromRedis(
+        this ConnectionMultiplexer connectionMultiplexer,
+        int database = -1,
+        string? routePattern = "Routes:*",
+        string? clusterPattern = "Clusters:*"
+    )
+    {
+        try
+        {
+            var server = connectionMultiplexer.GetServer(connectionMultiplexer.GetEndPoints().First());
+            var routes = server.Keys(database: database, pattern: routePattern);
+            var clusters = server.Keys(database: database, pattern: clusterPattern);
+            var routeConfigs = routes.Select(r => RedisOperations.GetRouteConfigFromValue(connectionMultiplexer.GetDatabase(database).StringGet(r)))
+                                    .Where(c => c is not null)
+                                    .ToImmutableList() ?? [];
+            var clusterConfigs = clusters.Select(c => RedisOperations.GetClusterConfigFromValue(connectionMultiplexer.GetDatabase(database).StringGet(c)))
+                                    .Where(c => c is not null)
+                                    .ToImmutableList() ?? [];
+            return (routeConfigs!,clusterConfigs!);
+        }
+        catch
+        {
+            return ([],[]);
+        }
+    }
 }

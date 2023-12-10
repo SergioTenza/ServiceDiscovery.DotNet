@@ -21,5 +21,5 @@ public static class RedisOperations
             return JsonSerializer.Deserialize<ClusterConfig>(value.ToString());
         }
         return null;
-    };
+    };    
 }
