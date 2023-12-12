@@ -19,17 +19,17 @@ internal class Program
             .Title("Which [green]communication pattern[/] would you use?")
             .PageSize(3)        
             .AddChoices(new[] {
-                "Rest", "RabbitMQ", "Redis"
+                "[red]Redis[/]", "[orange3]RabbitMQ[/]", "[green]Rest[/]"
             }));
-            var connection = communication switch 
+            (string connectionString,string text) connection = communication switch 
             {
-                "Redis" => AnsiConsole.Ask<string>("What's your [green]Redis[/] connectionstring?"),
-                "RabbitMQ" => AnsiConsole.Ask<string>("What's your [green]RabbitMQ[/] connectionstring?"),
-                "Rest" => AnsiConsole.Ask<string>("What's your [green]Rest[/] connectionstring?"),
-                _ => string.Empty
+                "[red]Redis[/]" => (AnsiConsole.Ask<string>("What's your [red]Redis[/] connectionstring?"),"Redis"),
+                "[orange3]RabbitMQ[/]" => (AnsiConsole.Ask<string>("What's your [orange3]RabbitMQ[/] connectionstring?"),"RabbitMQ"),
+                "[green]Rest[/]" => (AnsiConsole.Ask<string>("What's your [green]Rest[/] connectionstring?"),"Rest"),
+                _ => (string.Empty,string.Empty)
             };
 
-            AnsiConsole.WriteLine($"Selected {communication} with ConnectionString: '{connection}' ");
+            AnsiConsole.Markup($"Selected {communication} with ConnectionString: [underline Blue]{connection.connectionString}[/] ");
         }
 
         
