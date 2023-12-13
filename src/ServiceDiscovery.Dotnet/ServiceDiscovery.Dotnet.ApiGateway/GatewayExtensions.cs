@@ -72,22 +72,33 @@ public static class GatewayExtensions
 	};
 	public static IReverseProxyBuilder LoadFromRedis(this IReverseProxyBuilder builder, IConfiguration configuration)
 	{
-		var connectionString = configuration.GetConnectionString("cache");
-		ArgumentNullException.ThrowIfNullOrWhiteSpace(connectionString);
-		var redis = ConnectionMultiplexer.Connect(connectionString);
-		var db = redis.GetDatabase(0);
-		var server = redis.GetServer(redis.GetEndPoints().First());
-		var routes = server.Keys(database: 0, pattern: "Routes:*");
-		var clusters = server.Keys(database: 0, pattern: "Clusters:*");
-		var routeConfigs = routes.Select(r => RedisOperations.GetRouteConfigFromValue(redis.GetDatabase().StringGet(r)))
-								.Where(c => c is not null)
-								.ToImmutableList() ?? [];
-		var clusterConfigs = clusters.Select(c => RedisOperations.GetClusterConfigFromValue(redis.GetDatabase().StringGet(c)))
-								.Where(c => c is not null)
-								.ToImmutableList() ?? [];
+		try 
+		{
+			
+            var connectionString = configuration.GetConnectionString("cache");
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(connectionString);
+			var redis = ConnectionMultiplexer.Connect(connectionString);
+            builder.Services.AddSingleton(redis);
+			var db = redis.GetDatabase(0);
+            var server = redis.GetServer(redis.GetEndPoints().First());
+            var routes = server.Keys(database: 0, pattern: "Routes:*");
+            var clusters = server.Keys(database: 0, pattern: "Clusters:*");
+            var routeConfigs = routes.Select(r => RedisOperations.GetRouteConfigFromValue(redis.GetDatabase().StringGet(r)))
+                                    .Where(c => c is not null)
+                                    .ToImmutableList() ?? [];
+            var clusterConfigs = clusters.Select(c => RedisOperations.GetClusterConfigFromValue(redis.GetDatabase().StringGet(c)))
+                                    .Where(c => c is not null)
+                                    .ToImmutableList() ?? [];
 
-		builder.Services.AddSingleton(new InMemoryConfigProvider(routeConfigs!, clusterConfigs!));
-		builder.Services.AddSingleton((Func<IServiceProvider, IProxyConfigProvider>)((IServiceProvider s) => s.GetRequiredService<InMemoryConfigProvider>()));
+            builder.Services.AddSingleton(new InMemoryConfigProvider(routeConfigs!, clusterConfigs!));
+            builder.Services.AddSingleton((Func<IServiceProvider, IProxyConfigProvider>)((IServiceProvider s) => s.GetRequiredService<InMemoryConfigProvider>()));
+        } 
+		catch 
+		{
+            builder.Services.AddSingleton(new InMemoryConfigProvider([], []));
+            builder.Services.AddSingleton((Func<IServiceProvider, IProxyConfigProvider>)((IServiceProvider s) => s.GetRequiredService<InMemoryConfigProvider>()));
+        }
+		
 		return builder;
 	}
 	public static (IReadOnlyList<RouteConfig> routes, IReadOnlyList<ClusterConfig> clusters) GetProxyFromRedis(

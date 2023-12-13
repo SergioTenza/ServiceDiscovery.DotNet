@@ -13,17 +13,18 @@ const string DEBUG_METADATA_KEY = "debug";
 const string DEBUG_VALUE = "true";
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddCors();
 builder.AddServiceDefaults();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddReverseProxy()
     //.LoadFromMemory([], [])
     .LoadFromRedis(builder.Configuration);
 //builder.Services.AddSingleton(new List<RouteConfig>());
 //builder.Services.AddSingleton(new List<ClusterConfig>());
 
-builder.Services.AddSingleton(services => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("cache")!));
+
 builder.Services.AddMassTransit(x =>
     {
         x.SetKebabCaseEndpointNameFormatter();
@@ -48,7 +49,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors(x => 
+{
+    x.WithOrigins(["http://127.0.0.1:5290"]);
+});
 app.UseHttpsRedirection();
 app.MapReverseProxy(proxyPipeline =>
 {

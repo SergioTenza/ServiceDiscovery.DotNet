@@ -10,6 +10,8 @@ internal class Program
         if(args.Length > 0)
         {
             //TODO: Pure CLI flow
+            
+            RedisConnection = ConnectionMultiplexer.Connect(args[5]);
         }
         else
         {
