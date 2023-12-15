@@ -8,33 +8,31 @@ public static class ClustersGroup
 {
     public static RouteGroupBuilder Clusters(this RouteGroupBuilder builder)
     {
-        builder.MapGet("/clusters", () => Array.Empty<ClusterConfig>());
+        builder.MapGet("/clusters",  ([FromServices]InMemoryConfigProvider configProvider) =>
+            Results.Ok(configProvider.GetConfig().Clusters.Select(r => r.ToClusterDto()).ToArray()));
 
-        builder.MapGet("/clusters/{clusterId}", (string clusterId) =>
-            new List<RouteConfig>().Where(r => r.ClusterId == clusterId) switch
+        builder.MapGet("/clusters/{clusterId}", (string clusterId,[FromServices] InMemoryConfigProvider configProvider) =>
+            configProvider.GetConfig().Clusters.Where(r => r.ClusterId == clusterId).FirstOrDefault() switch
             {
-                IEnumerable<ClusterConfig> clusters => Results.Ok(),
-                null => Results.NotFound(),
-                _ => Results.NotFound()
+                ClusterConfig cluster => Results.Ok(cluster.ToClusterDto()),
+                null => Results.NotFound()
             }
         );
-        // builder.MapPost("/clusters", (
-        //     ClusterDto clusterDto,
-        //     List<RouteConfig> routes,
-        //     List<ClusterConfig> clusters,
-        //     InMemoryConfigProvider configProvider) =>
-        //         clusters.Any(r => r.ClusterId == clusterDto.ClusterId) switch
-        //         {
-        //             true => Results.Conflict(),
-        //             false => ClustersResponses.InsertCluster(clusterDto, routes, clusters, configProvider)
-        //         });
-        // builder.MapPut("/clusters/{clusterId}", (string clusterId, List<ClusterConfig> cluster) =>
-        //     cluster.Where(r => r.ClusterId == clusterId) switch
-        //     {
-        //         IEnumerable<ClusterConfig> clusters => [],
-        //         null => Results.NotFound()
-        //     }
-        // );
+        builder.MapPost("/clusters", (
+            ClusterDto clusterDto,
+            [FromServices] InMemoryConfigProvider configProvider) =>
+                configProvider.GetConfig().Clusters.Any(r => r.ClusterId == clusterDto.ClusterId) switch
+                {
+                    true => Results.Conflict(),
+                    false => ClustersResponses.InsertCluster(clusterDto, configProvider)
+                });
+        builder.MapPut("/clusters/{clusterId}", (string clusterId, [FromServices] InMemoryConfigProvider configProvider) =>
+            configProvider.GetConfig().Clusters.Where(r => r.ClusterId == clusterId).FirstOrDefault() switch
+            {
+                ClusterConfig cluster => Results.Ok(cluster),
+                null => Results.NotFound()
+            }
+        );
         return builder;
     }
 }

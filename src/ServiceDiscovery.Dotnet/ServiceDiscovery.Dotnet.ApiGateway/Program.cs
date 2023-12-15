@@ -21,9 +21,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddReverseProxy()
     //.LoadFromMemory([], [])
     .LoadFromRedis(builder.Configuration);
-//builder.Services.AddSingleton(new List<RouteConfig>());
-//builder.Services.AddSingleton(new List<ClusterConfig>());
-
 
 builder.Services.AddMassTransit(x =>
     {
@@ -73,53 +70,54 @@ app.MapGroup("/v1")
 app.Map("/update", context =>
 {
     //TODO: Move to get actual data from Redis
-    context.RequestServices.GetRequiredService<InMemoryConfigProvider>().Update(GetRoutes(), GetClusters());
+    var configProvider = context.RequestServices.GetRequiredService<InMemoryConfigProvider>();
+    configProvider.Update([], []);
     return Task.CompletedTask;
 });
 
 app.Run();
 
-RouteConfig[] GetRoutes()
-{
-    return
-    [
-        new RouteConfig()
-        {
-            RouteId = "route" + Random.Shared.Next(), // Forces a new route id each time GetRoutes is called.
-            ClusterId = "cluster1",
-            Match = new RouteMatch
-            {
-                // Path or Hosts are required for each route. This catch-all pattern matches all request paths.
-                Path = "{**catch-all}"
+// RouteConfig[] GetRoutes()
+// {
+//     return
+//     [
+//         new RouteConfig()
+//         {
+//             RouteId = "route" + Random.Shared.Next(), // Forces a new route id each time GetRoutes is called.
+//             ClusterId = "cluster1",
+//             Match = new RouteMatch
+//             {
+//                 // Path or Hosts are required for each route. This catch-all pattern matches all request paths.
+//                 Path = "{**catch-all}"
                 
-            }
-        }
-    ];
-}
-ClusterConfig[] GetClusters()
-{
-    var debugMetadata = new Dictionary<string, string>
-    {
-        { DEBUG_METADATA_KEY, DEBUG_VALUE }
-    };
+//             }
+//         }
+//     ];
+// }
+// ClusterConfig[] GetClusters()
+// {
+//     var debugMetadata = new Dictionary<string, string>
+//     {
+//         { DEBUG_METADATA_KEY, DEBUG_VALUE }
+//     };
 
-    return
-    [
-        new ClusterConfig()
-        {
-            ClusterId = "cluster1",
-            SessionAffinity = new SessionAffinityConfig { Enabled = true, Policy = "Cookie", AffinityKeyName = ".Yarp.ReverseProxy.Affinity" },
-            Destinations = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "destination1", new DestinationConfig() { Address = "https://google.com" } },
-                { "debugdestination1", new DestinationConfig() {
-                    Address = "https://bing.com",
-                    Metadata = debugMetadata  }
-                },
-            }
-        }
-    ];
-}
+//     return
+//     [
+//         new ClusterConfig()
+//         {
+//             ClusterId = "cluster1",
+//             SessionAffinity = new SessionAffinityConfig { Enabled = true, Policy = "Cookie", AffinityKeyName = ".Yarp.ReverseProxy.Affinity" },
+//             Destinations = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
+//             {
+//                 { "destination1", new DestinationConfig() { Address = "https://google.com" } },
+//                 { "debugdestination1", new DestinationConfig() {
+//                     Address = "https://bing.com",
+//                     Metadata = debugMetadata  }
+//                 },
+//             }
+//         }
+//     ];
+// }
 Task CustomProxyStep(HttpContext context, Func<Task> next)
 {
     // Can read data from the request via the context

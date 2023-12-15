@@ -8,43 +8,32 @@ public static class RoutesGroup
 {
     public static RouteGroupBuilder Routes(this RouteGroupBuilder builder)
     {
-        builder.MapGet("/routes", ([FromServices]List<RouteConfig> routes) =>
-            routes.ToArray());
+        builder.MapGet("/routes", ([FromServices]InMemoryConfigProvider configProvider) =>
+            Results.Ok(configProvider.GetConfig().Routes.Select(r => r.ToRouteDto()).ToArray()));
 
-        // builder.MapGet("/routes/{routeId}", (string routeId, List<RouteConfig> routes) =>
-        //     routes.Where(r => r.RouteId == routeId).FirstOrDefault() switch
-        //     {
-        //         RouteConfig route => Results.Ok(new RouteDto
-        //         {
-        //             RouteId = route.RouteId,
-        //             ClusterId = route.ClusterId ?? string.Empty,
-        //             MatchPath = route.Match.Path ?? string.Empty
-        //         }),
-        //         null => Results.NotFound()
-        //     }
-        // );
+        builder.MapGet("/routes/{routeId}", (string routeId, [FromServices]InMemoryConfigProvider configProvider) =>
+            configProvider.GetConfig().Routes.Where(r => r.RouteId == routeId).FirstOrDefault() switch
+            {
+                RouteConfig route => Results.Ok( route.ToRouteDto()),
+                null => Results.NotFound()
+            }
+        );
         builder.MapPost("/routes", (
             [FromBody]RouteDto routeDto,
-            [FromServices]List<RouteConfig> routes,
-            [FromServices]List<ClusterConfig> clusters,
             [FromServices]InMemoryConfigProvider configProvider) =>
-                routes.Any(r => r.RouteId == routeDto.RouteId) switch
+                configProvider.GetConfig().Routes.Any(r => r.RouteId == routeDto.RouteId) switch
                 {
                     true => Results.Conflict(),
-                    false => RoutesResponses.InsertRoute(routeDto, routes, clusters, configProvider)
+                    false => RoutesResponses.InsertRoute(routeDto, configProvider)
                 });
-        // builder.MapPut("/routes/{routeId}", (string routeId, List<RouteConfig> routes) =>
-        //     routes.Where(r => r.RouteId == routeId).FirstOrDefault() switch
-        //     {
-        //         RouteConfig route => Results.Ok(new RouteDto
-        //         {
-        //             RouteId = route.RouteId,
-        //             ClusterId = route.ClusterId ?? string.Empty,
-        //             MatchPath = route.Match.Path ?? string.Empty
-        //         }),
-        //         null => Results.NotFound()
-        //     }
-        // );
+        builder.MapPut("/routes/{routeId}", (string routeId,[FromServices]InMemoryConfigProvider configProvider) =>
+            configProvider.GetConfig().Routes.Where(r => r.RouteId == routeId).FirstOrDefault() switch
+            {
+                RouteConfig route => Results.Ok(route.ToRouteDto()),
+                null => Results.NotFound()
+            }
+        );
         return builder;
     }
 }
+//return Results.Accepted($"http://localhost:5024/v1/routes/{routeDto.RouteId}",routeDto);       

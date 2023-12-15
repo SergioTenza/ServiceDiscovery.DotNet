@@ -28,12 +28,14 @@
     </em></p>   
 }
 
+<FluentTabs @bind-ActiveTabId="@activeid" OnTabChange="HandleOnTabChange" >
+    <FluentTab Label="Routes" Icon="@(new Icons.Regular.Size24.GlobeAdd())" Id="tab-routes">
 @if (RoutesState?.Value?.Routes is not null)
 {
     <h2>Routes</h2>
     if(!RoutesState.Value.Routes.Any())
     {
-        <h3>No routes found. Why don´t you create your first route?</h3>
+        <h3>No routes found. <br/> Create your first route?</h3>
     }
     if (RoutesState?.Value?.Routes.Any() ?? false)
     {
@@ -48,7 +50,7 @@
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.Match.Path)" Sortable="true" />
             <TemplateColumn Title="Hosts" Align="@Align.Center">
-                @if(context.Match.Hosts.Any())
+                @if(context?.Match?.Hosts?.Any() ?? false)
                 {   
                     <HostsSelect Hosts="context.Match.Hosts.Select(x => new Option<string> { Value = x, Text = x,Selected = false })"/>
                 }
@@ -65,8 +67,8 @@
     }
     <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditRouteAsync(new RouteDto()))" />
 }
-
-
+    </FluentTab>
+    <FluentTab Label="Clusters" Icon="@(new Icons.Regular.Size24.CollectionsAdd())" Id="tab-clusters">        
 <h2>Clusters</h2>
 <div>
     <FluentCombobox Style="margin-top: 10px;" Height="200px" Items=@routesCombo
@@ -96,8 +98,23 @@
             </TemplateColumn>
         </FluentDataGrid>        
 }
+    </FluentTab>
+</FluentTabs>
+
+
+
+
+
 </div>
 @code {
+
+    string? activeid = "tab-routes";
+    FluentTab? changedto;
+
+    private void HandleOnTabChange(FluentTab tab)
+    {
+        changedto = tab;
+    }
     RouteDto? RouteDialogData { get; set; }
     IEnumerable<ClusterDto>? ClusterDialogData {get;set;}
     bool canceled;

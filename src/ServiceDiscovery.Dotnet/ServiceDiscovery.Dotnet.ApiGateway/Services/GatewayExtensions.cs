@@ -20,12 +20,13 @@ public static class GatewayExtensions
 		{
 			RouteId = routeDto.RouteId,
 			ClusterId = routeDto.ClusterId,
-			Match = routeDto.Match.ToRouteMatch()
+			Match = routeDto?.Match?.ToRouteMatch() ?? new RouteMatch()
 		};
 	public static RouteMatch ToRouteMatch(this MatchDto matchDto) =>
 		new()
 		{
-
+			Path = matchDto?.Path ?? string.Empty,
+			Hosts = matchDto?.Hosts?.Select( h => h).ToArray() ?? []
 		};
 	public static SessionAffinityConfig ToSessionAffinityConfig(this SessionAffinityDto sessionAffinityDto) =>
 		new()
@@ -56,7 +57,8 @@ public static class GatewayExtensions
 	public static MatchDto ToMatchDto(this RouteMatch routeMatch) =>
 		new()
 		{
-
+			Path = routeMatch?.Path ?? string.Empty,
+			Hosts = routeMatch?.Hosts?.Select(h => h) ?? []
 		};
 
 	public static SessionAffinityDto ToSessionAffinityDto(this SessionAffinityConfig sessionAffinityConfig) =>
