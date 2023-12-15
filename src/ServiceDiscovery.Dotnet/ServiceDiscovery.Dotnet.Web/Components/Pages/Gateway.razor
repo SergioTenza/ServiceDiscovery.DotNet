@@ -48,7 +48,7 @@
         <FluentDataGrid Items="@RoutesState.Value.Routes.AsQueryable()">
             <PropertyColumn Property="@(p => p.RouteId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
-            <PropertyColumn Property="@(p => p.Match.Path)" Sortable="true" />
+            <PropertyColumn Property="@(p => p.Match.Path ?? string.Empty)" Sortable="true" />
             <TemplateColumn Title="Hosts" Align="@Align.Center">
                 @if(context?.Match?.Hosts?.Any() ?? false)
                 {   
