@@ -8,4 +8,7 @@
 <ItemGroup>
 <PackageReference Include="Fluxor.Blazor.Web" Version="5.9.1" />
 </ItemGroup>
+<ItemGroup>
+  <Folder Include="State\ClustersUseCase\" />
+</ItemGroup>
 </Project>
