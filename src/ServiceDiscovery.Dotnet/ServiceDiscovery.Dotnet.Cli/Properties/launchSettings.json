@@ -2,7 +2,7 @@
   "profiles": {
     "ServiceDiscovery.Dotnet.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "-u Sergio\r\n-s Redis\r\n-url localhost:6379"
+      "commandLineArgs": ""
     }
   }
 }
