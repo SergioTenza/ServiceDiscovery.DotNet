@@ -26,10 +26,10 @@ public static class ClustersGroup
                     true => Results.Conflict(),
                     false => ClustersResponses.InsertCluster(clusterDto, configProvider)
                 });
-        builder.MapPut("/clusters/{clusterId}", (string clusterId, [FromServices] InMemoryConfigProvider configProvider) =>
-            configProvider.GetConfig().Clusters.Where(r => r.ClusterId == clusterId).FirstOrDefault() switch
+        builder.MapPut("/clusters/{clusterId}", (ClusterDto clusterDto, [FromServices] InMemoryConfigProvider configProvider) =>
+            configProvider.GetConfig().Clusters.Where(r => r.ClusterId == clusterDto.ClusterId).FirstOrDefault() switch
             {
-                ClusterConfig cluster => Results.Ok(cluster),
+                ClusterConfig cluster =>  ClustersResponses.UpdateCluster(clusterDto, configProvider),
                 null => Results.NotFound()
             }
         );

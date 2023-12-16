@@ -12,7 +12,7 @@ public static class GatewayExtensions
 		{
 			ClusterId = clusterDto.ClusterId,
 			SessionAffinity = clusterDto.SessionAffinity.ToSessionAffinityConfig(),
-			Destinations = clusterDto.Destination.ToSessionAffinityConfig()
+			Destinations = clusterDto.Destinations.ToDestinationConfig()
 		};
 
 	public static RouteConfig ToRouteConfig(this RouteDto routeDto) =>
@@ -31,19 +31,32 @@ public static class GatewayExtensions
 	public static SessionAffinityConfig ToSessionAffinityConfig(this SessionAffinityDto sessionAffinityDto) =>
 		new()
 		{
-
+			Enabled = sessionAffinityDto.Enabled,
+			Policy = sessionAffinityDto.Policy,
+			AffinityKeyName = sessionAffinityDto.AffinityKeyName
 		};
-	public static IReadOnlyDictionary<string, DestinationConfig> ToSessionAffinityConfig(this Dictionary<string, DestinationConfigDto> destinationConfigDto) =>
-		new Dictionary<string, DestinationConfig>
-		{
-
-		};
+	public static IReadOnlyDictionary<string, DestinationConfig> ToDestinationConfig(this Dictionary<string, DestinationConfigDto> destinationConfigDto)
+	{
+		Dictionary<string, DestinationConfig> response = [];
+		foreach (var entry in destinationConfigDto)
+		{			
+			response.Add(key: entry.Key,
+				value: new DestinationConfig
+				{
+					Address = entry.Value.Address,
+					Metadata = entry.Value.Metadata
+				}
+			);
+		}
+		return response;
+	}
+		
 	public static ClusterDto ToClusterDto(this ClusterConfig clusterConfig) =>
 		new()
 		{
 			ClusterId = clusterConfig.ClusterId,
 			SessionAffinity = clusterConfig?.SessionAffinity?.ToSessionAffinityDto() ?? new SessionAffinityDto(),
-			Destination = clusterConfig?.Destinations?.ToDestinationConfigDto() ?? []
+			Destinations = clusterConfig?.Destinations?.ToDestinationConfigDto() ?? []
 		};
 
 	public static RouteDto ToRouteDto(this RouteConfig routeConfig) =>

@@ -41,7 +41,7 @@
                     <FluentTextField @bind-Value="@cluster.SessionAffinity.AffinityKeyName">AffinityKeyName:</FluentTextField>
                 </div>                
                 <FluentLabel>Destinations</FluentLabel>
-                <FluentDataGrid Items="@cluster.Destination.AsQueryable()">
+                <FluentDataGrid Items="@cluster.Destinations.AsQueryable()">
                     <PropertyColumn Property="@(p => p.Key)" Sortable="true" />
                     <PropertyColumn Property="@(p => p.Value.Address)" Sortable="true" />
                 </FluentDataGrid>
