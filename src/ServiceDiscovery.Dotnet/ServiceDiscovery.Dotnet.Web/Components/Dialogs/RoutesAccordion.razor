@@ -1,0 +1,39 @@
+﻿<FluentAccordion ActiveId="@activeId" OnAccordionItemChange="HandleOnAccordionItemChange">
+    @if(Routes is null)
+    {
+        <FluentAccordionItem Heading="Panel one">
+            <FluentIcon Value="@(new Icons.Regular.Size20.Globe())" Color="@Color.Neutral" Slot="start" Expanded="true"/>       
+            <FluentHeader>There are no routes registered actually!</FluentHeader>             
+            <FluentTooltip Anchor="delay3" Position=TooltipPosition.End Delay=600>
+                <p>You should consider making one default route.</p> 
+            </FluentTooltip>
+        </FluentAccordionItem>    
+    }
+    else
+    {
+
+    }
+
+    
+</FluentAccordion>
+
+@code {
+
+    [Parameter]
+    public IEnumerable<RouteDto>? Routes {get;init;}
+    protected override Task OnParametersSetAsync()
+    {
+        activeId = Routes switch
+        {
+            IEnumerable<RouteDto> routes => routes.Any() ? routes.First().RouteId : "accordion-1",
+            null => "accordion-1"
+        };
+        return base.OnParametersSetAsync();
+    }
+    string activeId = "accordion-1";
+    FluentAccordionItem? changed;
+    private void HandleOnAccordionItemChange(FluentAccordionItem item)
+    {
+        changed = item;
+    }
+}

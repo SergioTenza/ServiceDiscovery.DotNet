@@ -1,6 +1,7 @@
 using Fluxor;
 using MassTransit;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.FluentUI.AspNetCore.Components.Components.Tooltip;
 using ServiceDiscovery.Dotnet.Shared;
 using ServiceDiscovery.Dotnet.Web;
 using ServiceDiscovery.Dotnet.Web.Components;
@@ -42,6 +43,7 @@ builder.Services.AddFluxor(options =>
     options.ScanAssemblies(typeof(Program).Assembly, [typeof(BaseState).Assembly])
 );
 // FluentUI
+builder.Services.AddScoped<ITooltipService, TooltipService>();
 builder.Services.AddFluentUIComponents();
 var app = builder.Build();
 

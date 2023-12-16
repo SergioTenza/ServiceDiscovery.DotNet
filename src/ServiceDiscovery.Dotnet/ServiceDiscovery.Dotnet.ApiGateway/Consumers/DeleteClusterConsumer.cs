@@ -8,18 +8,16 @@ namespace ServiceDiscovery.Dotnet.ApiGateway;
 
 public class DeleteClusterConsumer : IConsumer<DeleteCluster>
 {
-    private readonly ConnectionMultiplexer _connectionMultiplexer;
-    private readonly InMemoryConfigProvider _inMemoryConfigProvider;  
+   private readonly InMemoryConfigProvider _inMemoryConfigProvider;  
     
-    public DeleteClusterConsumer(ConnectionMultiplexer connectionMultiplexer,InMemoryConfigProvider inMemoryConfigProvider)
+    public DeleteClusterConsumer(InMemoryConfigProvider inMemoryConfigProvider)
     {
-        _connectionMultiplexer = connectionMultiplexer;
+ 
         _inMemoryConfigProvider = inMemoryConfigProvider;            
-    }    
+    }
     public async Task Consume(ConsumeContext<DeleteCluster> context)
     {
-       var (routes, clusters) = _connectionMultiplexer.GetProxyFromRedis(0);
-        _inMemoryConfigProvider.Update(routes,clusters);
+ 
         await Task.CompletedTask;
     }
 }

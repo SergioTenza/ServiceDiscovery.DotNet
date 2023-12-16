@@ -19,8 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddReverseProxy()
-    //.LoadFromMemory([], [])
-    .LoadFromRedis(builder.Configuration);
+    .LoadFromMemory([], []);
+    //.LoadFromRedis(builder.Configuration);
 
 builder.Services.AddMassTransit(x =>
     {
@@ -132,7 +132,7 @@ Task CustomProxyStep(HttpContext context, Func<Task> next)
         foreach (var d in availableDestinationsFeature.AvailableDestinations)
         {
             //Todo: Replace with a lookup of metadata - but not currently exposed correctly here
-            if (d.DestinationId.Contains("debug") == useDebugDestinations) { filteredDestinations.Add(d); }
+            if (d.DestinationId.Contains(DEBUG_METADATA_KEY) == useDebugDestinations) { filteredDestinations.Add(d); }
         }
         availableDestinationsFeature.AvailableDestinations = filteredDestinations;
     }

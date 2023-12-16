@@ -26,10 +26,10 @@ public static class RoutesGroup
                     true => Results.Conflict(),
                     false => RoutesResponses.InsertRoute(routeDto, configProvider)
                 });
-        builder.MapPut("/routes/{routeId}", (string routeId,[FromServices]InMemoryConfigProvider configProvider) =>
-            configProvider.GetConfig().Routes.Where(r => r.RouteId == routeId).FirstOrDefault() switch
+        builder.MapPut("/routes/{routeId}", (RouteDto routeDto,[FromServices]InMemoryConfigProvider configProvider) =>
+            configProvider.GetConfig().Routes.Where(r => r.RouteId == routeDto.RouteId).FirstOrDefault() switch
             {
-                RouteConfig route => Results.Ok(route.ToRouteDto()),
+                RouteConfig routeConfig => RoutesResponses.UpdateRoute(routeDto, routeConfig,configProvider),
                 null => Results.NotFound()
             }
         );

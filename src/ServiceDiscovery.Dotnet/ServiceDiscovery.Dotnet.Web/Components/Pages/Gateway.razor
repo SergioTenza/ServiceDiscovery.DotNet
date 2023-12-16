@@ -28,6 +28,11 @@
     </em></p>   
 }
 
+@if (RoutesState?.Value?.Routes is not null)
+{
+    <RoutesAccordion Routes="RoutesState?.Value?.Routes"></RoutesAccordion>
+}
+
 <FluentTabs @bind-ActiveTabId="@activeid" OnTabChange="HandleOnTabChange" >
     <FluentTab Label="Routes" Icon="@(new Icons.Regular.Size24.GlobeAdd())" Id="tab-routes">
 @if (RoutesState?.Value?.Routes is not null)

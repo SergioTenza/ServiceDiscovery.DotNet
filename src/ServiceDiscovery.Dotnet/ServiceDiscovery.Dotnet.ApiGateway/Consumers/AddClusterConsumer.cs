@@ -7,18 +7,14 @@ namespace ServiceDiscovery.Dotnet.ApiGateway;
 
 public class AddClusterConsumer : IConsumer<AddCluster>
 {
-    private readonly ConnectionMultiplexer _connectionMultiplexer;
     private readonly InMemoryConfigProvider _inMemoryConfigProvider;  
     
-    public AddClusterConsumer(ConnectionMultiplexer connectionMultiplexer,InMemoryConfigProvider inMemoryConfigProvider)
+    public AddClusterConsumer(InMemoryConfigProvider inMemoryConfigProvider)
     {
-        _connectionMultiplexer = connectionMultiplexer;
         _inMemoryConfigProvider = inMemoryConfigProvider;            
     }
     public async Task Consume(ConsumeContext<AddCluster> context)
     {
-        var (routes, clusters) = _connectionMultiplexer.GetProxyFromRedis(0);
-        _inMemoryConfigProvider.Update(routes,clusters);
         await Task.CompletedTask;
     }
 }
