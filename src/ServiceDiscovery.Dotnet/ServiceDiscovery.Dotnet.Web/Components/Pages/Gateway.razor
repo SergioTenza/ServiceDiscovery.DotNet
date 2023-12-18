@@ -9,8 +9,7 @@
 @inject GatewayApiClient GatewayApi
 @inject IDialogService DialogService
 
-@inject IState<RoutesState> RoutesState
-@inject IState<ClustersState> ClustersState
+@inject IState<GatewayState> GatewayState
 @inject IDispatcher Dispatcher
 
 <PageTitle>Gateway</PageTitle>
@@ -18,7 +17,7 @@
 <h1>Gateway</h1>
 
 <div style="height: 100%; overflow:visible;">
-@if (RoutesState?.Value?.Routes is null)
+@if (GatewayState?.Value?.Routes is null)
 {
     <p>Obtaining services please wait...</p>
     <p><em>
@@ -27,22 +26,21 @@
         </div>
     </em></p>   
 }
-
-@if (RoutesState?.Value?.Routes is not null)
+else
 {
-    <RoutesAccordion Routes="RoutesState?.Value?.Routes"></RoutesAccordion>
+    <RoutesAccordion/>
 }
 
 <FluentTabs @bind-ActiveTabId="@activeid" OnTabChange="HandleOnTabChange" >
     <FluentTab Label="Routes" Icon="@(new Icons.Regular.Size24.GlobeAdd())" Id="tab-routes">
-@if (RoutesState?.Value?.Routes is not null)
+@if (GatewayState?.Value?.Routes is not null)
 {
     <h2>Routes</h2>
-    if(!RoutesState.Value.Routes.Any())
+    if(!GatewayState.Value.Routes.Any())
     {
         <h3>No routes found. <br/> Create your first route?</h3>
     }
-    if (RoutesState?.Value?.Routes.Any() ?? false)
+    if (GatewayState?.Value?.Routes.Any() ?? false)
     {
 		@* <FluentGrid  Spacing="3" Justify="JustifyContent.Center" Style="background-color: var(--neutral-layer-3);margin: 20px;">
 			@foreach(var route in RoutesState!.Value.Routes)
@@ -50,7 +48,7 @@
 				<Route RouteDto="route"></Route>
 			}
 		</FluentGrid> *@
-        <FluentDataGrid Items="@RoutesState.Value.Routes.AsQueryable()">
+        <FluentDataGrid Items="@GatewayState.Value.Routes.AsQueryable()">
             <PropertyColumn Property="@(p => p.RouteId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.Match.Path ?? string.Empty)" Sortable="true" />
@@ -84,16 +82,16 @@
         @bind-Value="@clusterValue" />
     <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditClusterAsync(clusterValue ?? string.Empty))" />
 </div>      
-@if(!ClustersState?.Value?.Clusters.Any() ?? false)
+@if(!GatewayState?.Value?.Clusters.Any() ?? false)
 {
     <h3>No clusters found.</h3>
 }
 
 
 
-@if(ClustersState?.Value?.Clusters.Any() ?? false)
+@if(GatewayState?.Value?.Clusters.Any() ?? false)
 {
-        <FluentDataGrid Items="@ClustersState?.Value?.Clusters.AsQueryable()">
+        <FluentDataGrid Items="@GatewayState?.Value?.Clusters.AsQueryable()">
             <PropertyColumn Property="@(p => p.ClusterId)" Sortable="true" />
             <PropertyColumn Property="@(p => p.Destinations)" Sortable="true" />
             <PropertyColumn Property="@(p => p.SessionAffinity.AffinityKeyName)" Sortable="true" />
@@ -137,7 +135,7 @@
             }
             return response;
         };
-    private IEnumerable<Option<string>> routesCombo => RoutesState?.Value?.Routes switch
+    private IEnumerable<Option<string>> routesCombo => GatewayState?.Value?.Routes switch
         {
             IEnumerable<RouteDto> routes => GetComboOptions(routes),
             _ => [new Option<string> {Value = "no route found",Text = "no route found", Selected =  true}]
@@ -147,13 +145,12 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();        
-        Dispatcher.Dispatch(new FetchRoutesAction());        
-        Dispatcher.Dispatch(new FetchClustersAction());        
+        Dispatcher.Dispatch(new FetchGatewayAction());        
     }
 
     private async Task OpenEditClusterAsync(string clusterId)
     {
-        var clusters = ClustersState.Value.Clusters.Where(c=> c.ClusterId == clusterId);
+        var clusters = GatewayState.Value.Clusters.Where(c=> c.ClusterId == clusterId);
         if(clusters.Any())
         {
             ClusterDialogData = clusters;
@@ -203,7 +200,7 @@
 
             var result = await dialog.Result;
             var data = result.Data as RouteDto;
-            var routes = RoutesState?.Value?.Routes?.Select(r => r.RouteId != data?.RouteId 
+            var routes = GatewayState?.Value?.Routes?.Select(r => r.RouteId != data?.RouteId 
                                             ? r 
                                             : r with 
                                             {
@@ -240,8 +237,8 @@
         canceled = result.Cancelled;
         if(!canceled)
         {
-            var routes = RoutesState?.Value?.Routes?.Where(r=> r.RouteId != routeDto?.RouteId).ToArray();
-            var clusters = ClustersState?.Value?.Clusters?.Where(r=> r.ClusterId != routeDto?.ClusterId).ToArray();
+            var routes = GatewayState?.Value?.Routes?.Where(r=> r.RouteId != routeDto?.RouteId).ToArray();
+            var clusters = GatewayState?.Value?.Clusters?.Where(r=> r.ClusterId != routeDto?.ClusterId).ToArray();
             StateHasChanged();
         }
     }
