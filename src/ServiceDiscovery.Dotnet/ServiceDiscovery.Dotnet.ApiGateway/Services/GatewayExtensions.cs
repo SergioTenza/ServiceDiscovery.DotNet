@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using Grpc.Core;
 using ServiceDiscovery.Dotnet.Shared;
 using StackExchange.Redis;
 using Yarp.ReverseProxy.Configuration;
@@ -81,10 +82,16 @@ public static class GatewayExtensions
 		};
 
 	public static Dictionary<string, DestinationConfigDto> ToDestinationConfigDto(this IReadOnlyDictionary<string, DestinationConfig> destinationConfig) =>
-	new()
-	{
+     destinationConfig.Any() 
+	 	? destinationConfig.Select(dc => 
+			(dc.Key,
+			new DestinationConfigDto
+			{
+				Address = dc.Value.Address,
+				Metadata = (Dictionary<string, string>)dc.Value.Metadata!
 
-	};
+			})).ToDictionary()
+		: [];
 	public static IReverseProxyBuilder LoadFromRedis(this IReverseProxyBuilder builder, IConfiguration configuration)
 	{
 		try 

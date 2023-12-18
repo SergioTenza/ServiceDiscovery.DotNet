@@ -62,6 +62,7 @@ app.MapReverseProxy(proxyPipeline =>
 
 
 app.MapGroup("/v1")
+    .Gateway()
     .Routes()
     .Clusters();
 
