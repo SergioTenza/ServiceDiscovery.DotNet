@@ -10,19 +10,7 @@
     </FluentStack>
 </FluentDialogHeader>
 
-@* Footer *@
-<FluentDialogFooter>
-    @if (Content is null)
-    {
-        <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Create</FluentButton>
-    }
-    else
-    {
-        <FluentButton Appearance="Appearance.Accent" OnClick="@UpdateAsync">Update</FluentButton>
-    }
 
-    <FluentButton Appearance="Appearance.Accent" OnClick="@CloseAsync">Close</FluentButton>
-</FluentDialogFooter>
 
 @* Body *@
 <FluentDialogBody>
@@ -41,6 +29,19 @@
 
     </FluentStack>
 </FluentDialogBody>
+@* Footer *@
+<FluentDialogFooter>
+    @if (Content is null)
+    {
+        <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Create</FluentButton>
+    }
+    else
+    {
+        <FluentButton Appearance="Appearance.Accent" OnClick="@UpdateAsync">Update</FluentButton>
+    }
+
+    <FluentButton Appearance="Appearance.Accent" OnClick="@CloseAsync">Close</FluentButton>
+</FluentDialogFooter>
 
 @code {
     [Parameter]

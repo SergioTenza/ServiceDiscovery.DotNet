@@ -1,6 +1,5 @@
 ﻿@page "/gateway"
 
-
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @attribute [StreamRendering(true)]
@@ -16,23 +15,6 @@
 
 <h1>Gateway</h1>
 
-<div style="height: 100%; overflow:visible;">
-@if (GatewayState?.Value?.Routes is null)
-{
-    <p>Obtaining services please wait...</p>
-    <p><em>
-        <div style="width: 50%; display: grid; grid-gap: 12px; grid-auto-flow: column;">            
-            <FluentProgress></FluentProgress>             
-        </div>
-    </em></p>   
-}
-else
-{
-    <RoutesAccordion/>
-}
-
-<FluentTabs @bind-ActiveTabId="@activeid" OnTabChange="HandleOnTabChange" >
-    <FluentTab Label="Routes" Icon="@(new Icons.Regular.Size24.GlobeAdd())" Id="tab-routes">
 @if (GatewayState?.Value?.Routes is not null)
 {
     <h2>Routes</h2>
@@ -70,9 +52,8 @@ else
     }
     <FluentButton Style="margin-top: 10px;" IconEnd="@(new Icons.Regular.Size20.Add())" OnClick="@(() => OpenEditRouteAsync(new RouteDto()))" />
 }
-    </FluentTab>
-    <FluentTab Label="Clusters" Icon="@(new Icons.Regular.Size24.CollectionsAdd())" Id="tab-clusters">        
-<h2>Clusters</h2>
+   
+@* <h2>Clusters</h2>
 <div>
     <FluentCombobox Style="margin-top: 10px;" Height="200px" Items=@routesCombo
         OptionText="@(i => i.Text)" 
@@ -100,15 +81,9 @@ else
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
             </TemplateColumn>
         </FluentDataGrid>        
-}
-    </FluentTab>
-</FluentTabs>
+} *@
 
 
-
-
-
-</div>
 @code {
 
     string? activeid = "tab-routes";
@@ -154,12 +129,12 @@ else
         if(clusters.Any())
         {
             ClusterDialogData = clusters;
-            var dialog = await DialogService.ShowDialogAsync<ClusterDialog>(ClusterDialogData, new DialogParameters()
+            var dialog = await DialogService.ShowPanelAsync<ClusterDialog>(ClusterDialogData, new DialogParameters()
             {
-                Height = "500px",
+                Alignment = HorizontalAlignment.Right,
                 Title = $"Updating the Clusters: {ClusterDialogData}",
-                PreventDismissOnOverlayClick = true,
-                PreventScroll = true,
+                PrimaryAction = "Yes",
+                SecondaryAction = "No",
             });
 
             var result = await dialog.Result;
@@ -168,12 +143,12 @@ else
         }
         else
         {
-            var dialog = await DialogService.ShowDialogAsync<ClusterDialog>(default, new DialogParameters()
+            var dialog = await DialogService.ShowPanelAsync<ClusterDialog>(default, new DialogParameters()
             {
-                Height = "500px",
+                Alignment = HorizontalAlignment.Right,
                 Title = $"Create new Cluster",
-                PreventDismissOnOverlayClick = true,
-                PreventScroll = true,
+                PrimaryAction = "Yes",
+                SecondaryAction = "No",
             });
 
             var result = await dialog.Result;
@@ -190,12 +165,13 @@ else
         RouteDialogData = routeDto;
         if(RouteDialogData is not null && !string.IsNullOrEmpty(RouteDialogData?.RouteId))
         {
-            var dialog = await DialogService.ShowDialogAsync<RouteDialog>(RouteDialogData, new DialogParameters()
+            var dialog = await DialogService.ShowPanelAsync<RouteDialog>(RouteDialogData, new DialogParameters()
             {
-                Height = "360px",
+                Width = "50vw",
+                Alignment = HorizontalAlignment.Right,
                 Title = $"Updating the Route: {RouteDialogData.ClusterId}",
-                PreventDismissOnOverlayClick = true,
-                PreventScroll = true,
+                PrimaryAction = "Yes",
+                SecondaryAction = "No",
             });
 
             var result = await dialog.Result;
@@ -212,12 +188,13 @@ else
         }
         else    
         {
-            var dialog = await DialogService.ShowDialogAsync<RouteDialog>(default, new DialogParameters()
+            var dialog = await DialogService.ShowPanelAsync<RouteDialog>(default, new DialogParameters()
             {
-                Height = "360px",
+                Width = "50vw",
+                Alignment = HorizontalAlignment.Right,
                 Title = $"Create new route",
-                PreventDismissOnOverlayClick = true,
-                PreventScroll = true,
+                PrimaryAction = "Yes",
+                SecondaryAction = "No",
             });
 
             var result = await dialog.Result;

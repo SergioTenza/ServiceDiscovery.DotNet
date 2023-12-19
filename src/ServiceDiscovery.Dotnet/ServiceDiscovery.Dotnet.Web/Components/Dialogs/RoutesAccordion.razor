@@ -1,16 +1,18 @@
 ﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<GatewayState> GatewayState
 
-<FluentHeader>Accordion</FluentHeader>
-<FluentAccordion ActiveId="@activeId" OnAccordionItemChange="HandleOnAccordionItemChange">
-    @if(GatewayState.Value.Routes is null)
+
+<FluentAccordion ExpandMode="AccordionExpandMode.Single">
+    @if(GatewayState.Value.Routes is null || !GatewayState.Value.Routes.Any())
     {
         <FluentAccordionItem Heading="No Routes">
-            <FluentIcon Value="@(new Icons.Regular.Size20.Globe())" Color="@Color.Neutral" Slot="start" Expanded="true"/>       
-            <FluentHeader>There are no routes registered actually!</FluentHeader>             
-            <FluentTooltip Anchor="delay3" Position=TooltipPosition.End Delay=600>
-                <p>You should consider making one default route.</p> 
-            </FluentTooltip>
+            <FluentIcon Value="@(new Icons.Regular.Size20.Globe())" Color="@Color.Neutral" Slot="start" Expanded="false"/>       
+        </FluentAccordionItem>    
+        <FluentAccordionItem Heading="No Routes">
+            <FluentIcon Value="@(new Icons.Regular.Size20.Globe())" Color="@Color.Neutral" Slot="start" Expanded="false"/>       
+        </FluentAccordionItem>    
+        <FluentAccordionItem Heading="No Routes">
+            <FluentIcon Value="@(new Icons.Regular.Size20.Globe())" Color="@Color.Neutral" Slot="start" Expanded="false"/>       
         </FluentAccordionItem>    
     }
     else
@@ -32,10 +34,5 @@
 </FluentAccordion>
 
 @code {    
-    string activeId = "accordion-1";
-    FluentAccordionItem? changed;
-    private void HandleOnAccordionItemChange(FluentAccordionItem item)
-    {
-        changed = item;
-    }
+   
 }

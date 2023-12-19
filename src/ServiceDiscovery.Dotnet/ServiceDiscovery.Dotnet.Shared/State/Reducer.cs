@@ -4,9 +4,9 @@ namespace ServiceDiscovery.Dotnet.Shared;
 
 public static class Reducer
 {
-  // [ReducerMethod]
-  // public static RoutesState ReduceIncrementCounterAction(RoutesState state, AddRouteAction action) =>
-  //  state with { Routes = state.Routes.Append(action.RouteDto) };
+  [ReducerMethod]
+  public static GatewayState ReduceIncrementCounterAction(GatewayState state, AddRouteAction action) =>
+   state with { Routes = state.Routes.Append(action.RouteDto) };
    
   // [ReducerMethod(typeof(FetchRoutesAction))]
   // public static RoutesState ReduceFetchDataAction(RoutesState state) => state with
