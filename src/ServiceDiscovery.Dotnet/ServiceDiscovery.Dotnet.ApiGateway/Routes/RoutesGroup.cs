@@ -38,8 +38,8 @@ public static class RoutesGroup
             var exists = configProvider.GetConfig().Routes.Where(r => r.RouteId == routeId).FirstOrDefault();
             return exists switch 
             {
-                RouteConfig config => ,
-                _ => Results.NotFound()
+                RouteConfig config => RoutesResponses.DeleteRoute(config,configProvider),
+                null => Results.NotFound()
             };
            
         });
