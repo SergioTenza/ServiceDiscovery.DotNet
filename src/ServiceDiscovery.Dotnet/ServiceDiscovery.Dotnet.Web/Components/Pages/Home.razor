@@ -7,7 +7,8 @@
 
 <h2>API Gateway management dashboard</h2>
 <h3>Built with dotnet 8 and Aspire Framework</h3>  
-@* <FluentButton OnClick="@AddInNotificationCenter" Appearance="Appearance.Accent">Add on top</FluentButton> *@
+@* <FluentButton OnClick="@AddInNotificationCenter" Appearance="Appearance.Accent">Add on Notification</FluentButton>
+<FluentButton OnClick="@AddInTopBar" Appearance="Appearance.Accent">Add on top</FluentButton> *@
 
 @code{
 	int counter = 0;
@@ -17,7 +18,7 @@
             Href = "https://bing.com",
             OnClick = (e) => { Console.WriteLine($"Message 'learn more' clicked"); return Task.CompletedTask; }
         };
-	void AddInTopBar()
+	@* void AddInTopBar()
     {
         var message = $"Simple message #{counter++}";
         var type = Enum.GetValues<MessageIntent>()[counter % 4];
@@ -34,5 +35,5 @@
             options.Timestamp = DateTime.Now;
             options.Section = "NOTIFICATION_CENTER";
         });
-    }
+    } *@
 }

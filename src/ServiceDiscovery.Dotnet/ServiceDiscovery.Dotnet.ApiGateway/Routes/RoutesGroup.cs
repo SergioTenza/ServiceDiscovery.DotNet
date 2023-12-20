@@ -33,6 +33,16 @@ public static class RoutesGroup
                 null => Results.NotFound()
             }
         );
+        builder.MapDelete("/routes/{routeId}", (string routeId,[FromServices]InMemoryConfigProvider configProvider) =>
+        {
+            var exists = configProvider.GetConfig().Routes.Where(r => r.RouteId == routeId).FirstOrDefault();
+            return exists switch 
+            {
+                RouteConfig config => ,
+                _ => Results.NotFound()
+            };
+           
+        });
         return builder;
     }
 }

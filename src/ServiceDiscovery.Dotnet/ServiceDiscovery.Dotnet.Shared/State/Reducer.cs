@@ -4,9 +4,7 @@ namespace ServiceDiscovery.Dotnet.Shared;
 
 public static class Reducer
 {
-  [ReducerMethod]
-  public static GatewayState ReduceIncrementCounterAction(GatewayState state, AddRouteAction action) =>
-   state with { Routes = state.Routes.Append(action.RouteDto) };
+  
    
   // [ReducerMethod(typeof(FetchRoutesAction))]
   // public static RoutesState ReduceFetchDataAction(RoutesState state) => state with
@@ -35,19 +33,5 @@ public static class Reducer
   //   Clusters = action.Routes
   // };
 
-  [ReducerMethod(typeof(FetchGatewayAction))]
-  public static GatewayState ReduceFetchDataAction(GatewayState state) => state with
-  {
-    IsLoading = true,
-    Clusters = [],
-    Routes = []
-  };
-  [ReducerMethod]
-  public static GatewayState ReduceFetchRoutesResultAction(GatewayState state, FetchGatewayResultAction action) =>
-  state with
-  {
-    IsLoading = false,
-    Clusters = action.Clusters,
-    Routes = action.Routes
-  };
+  
 }

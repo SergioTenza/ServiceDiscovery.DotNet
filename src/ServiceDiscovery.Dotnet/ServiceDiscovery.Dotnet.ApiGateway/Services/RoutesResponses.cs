@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Http.HttpResults;
 using ServiceDiscovery.Dotnet.Shared;
 using Yarp.ReverseProxy.Configuration;
 
@@ -36,6 +37,22 @@ public static class RoutesResponses
         }
     };
 
+     public static Func<RouteConfig,InMemoryConfigProvider, IResult> DeleteRoute = (routeConfig,configProvider) =>
+    {
+        try
+        { 
+            var routes = configProvider.GetConfig().Routes.Where(r=> r.RouteId != routeConfig.RouteId).ToArray();
+            var clusters = configProvider.GetConfig().Clusters.Where(c=> c.ClusterId != routeConfig.ClusterId).ToArray();
+            configProvider.Update(routes,clusters);
+            return Results.Ok(routeConfig.RouteId);
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem(ex.Message, nameof(routeConfig), 500, "Error Adding the route.");
+        }
+    };
+
+    
     private static IResult GenerateResultFromRoutes(InMemoryConfigProvider configProvider, IEnumerable<ClusterConfig> clusters, IEnumerable<RouteConfig> routes, RouteDto routeDto, RouteConfig routeConfig)
     {
         try
