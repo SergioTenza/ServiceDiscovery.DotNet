@@ -62,7 +62,7 @@ public class GatewayApiClient(IHttpClientFactory httpClientFactory, IMessageServ
         {
             try
             {
-                var clusters = await httpClient.GetFromJsonAsync<GatewayConfig>("/v1/gateway");
+                var clusters = await httpClient.GetFromJsonAsync<ReverseProxy>("/v1/gateway");
                 ArgumentNullException.ThrowIfNull(dispatcher);
                 if (clusters is not null)
                 {
@@ -100,27 +100,45 @@ public class GatewayApiClient(IHttpClientFactory httpClientFactory, IMessageServ
                     {
                         Dto = action.Dto
                     });
-					var message = $"Route {action.Dto.RouteId} successfully added to gateway";
-        			var type = MessageIntent.Success;
-        			await _messageService.ShowMessageBarAsync(message, type, "TOP");
-					dispatcher.Dispatch(new FetchGatewayAction());
+                    var message = $"Route {action.Dto.RouteId} successfully added to gateway";
+                    var type = MessageIntent.Success;
+                    await _messageService.ShowMessageBarAsync(message, type, "TOP");
+                    dispatcher.Dispatch(new FetchGatewayAction());
 
                 }
                 else
                 {
                     var message = $"Cannot add route to gateway<br/> {posted?.StatusCode}\n{posted?.ReasonPhrase}";
-        			var type = MessageIntent.Error;
-        			await _messageService.ShowMessageBarAsync(message, type, "TOP");
-                }               
+                    var type = MessageIntent.Error;
+                    await _messageService.ShowMessageBarAsync(message, type, "TOP");
+                }
 
             }
             catch (Exception ex)
             {
                 var message = $"Cannot add route to gateway\n 500\n{ex.Message}";
-				var type = MessageIntent.Error;
-				await _messageService.ShowMessageBarAsync(message, type, "TOP");
+                var type = MessageIntent.Error;
+                await _messageService.ShowMessageBarAsync(message, type, "TOP");
             }
-			await Task.CompletedTask;
+            await Task.CompletedTask;
         }
     }
-}
+
+    public async Task GetGatewayConfigAsJson()
+    {
+        var httpClient = _httpClientFactory.CreateClient("Gateway");
+        if (httpClient is not null)
+        {
+            try
+            {
+                var petition = await httpClient.GetFromJsonAsync<ReverseProxy>("/v1/gateway");
+            }
+            catch (Exception ex)
+            {
+                var message = $"Cannot get config from gateway configuration\n 500\n{ex.Message}";
+                var type = MessageIntent.Error;
+                await _messageService.ShowMessageBarAsync(message, type, "TOP");
+            }
+            await Task.CompletedTask;
+        }
+    }

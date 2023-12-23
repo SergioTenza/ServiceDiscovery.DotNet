@@ -11,7 +11,7 @@ public static class GatewayGroup
         builder.MapGet("/gateway",(InMemoryConfigProvider provider)=>
         {   
             var config = provider.GetConfig();  
-            return Results.Ok(new GatewayConfig
+            return Results.Ok(new ReverseProxy
             {
               
               Routes = config.Routes.Select(r=> r.ToRouteDto()),
