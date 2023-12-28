@@ -153,7 +153,7 @@
 
     async Task DownloadConfig()
     {
-        var json = await GatewayApiClient.GetGatewayConfigAsJson();
+        var json = await GatewayApi.GetGatewayConfigAsJson();
     }
     string? activeid = "tab-routes";
     FluentTab? changedto;

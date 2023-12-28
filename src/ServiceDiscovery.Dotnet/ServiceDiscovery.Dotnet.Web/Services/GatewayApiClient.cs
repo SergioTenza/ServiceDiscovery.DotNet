@@ -124,7 +124,7 @@ public class GatewayApiClient(IHttpClientFactory httpClientFactory, IMessageServ
         }
     }
 
-    public async Task GetGatewayConfigAsJson()
+    public async Task<ReverseProxy> GetGatewayConfigAsJson()
     {
         var httpClient = _httpClientFactory.CreateClient("Gateway");
         if (httpClient is not null)
@@ -132,13 +132,17 @@ public class GatewayApiClient(IHttpClientFactory httpClientFactory, IMessageServ
             try
             {
                 var petition = await httpClient.GetFromJsonAsync<ReverseProxy>("/v1/gateway");
+                return petition ?? throw new Exception("Cannot get config from gateway configuration");
+
             }
             catch (Exception ex)
             {
                 var message = $"Cannot get config from gateway configuration\n 500\n{ex.Message}";
                 var type = MessageIntent.Error;
                 await _messageService.ShowMessageBarAsync(message, type, "TOP");
+                throw;
             }
-            await Task.CompletedTask;
         }
+        throw new Exception("Cannot get config from gateway configuration");
     }
+}

@@ -1,6 +1,6 @@
 ﻿namespace ServiceDiscovery.Dotnet.Shared;
 
-public class ClusterDto
+public class Cluster : DomainEntity
 {
     public string ClusterId { get; set; } = string.Empty;
     public SessionAffinityDto SessionAffinity { get; set; } = new();
