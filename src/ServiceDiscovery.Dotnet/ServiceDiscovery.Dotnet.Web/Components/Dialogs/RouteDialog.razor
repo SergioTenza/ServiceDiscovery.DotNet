@@ -15,19 +15,11 @@
 @* Body *@
 <FluentDialogBody>
     <FluentStack Orientation="Orientation.Vertical">
-        @if (Content is not null)
-        {
-            <FluentTextField @bind-Value="@Content.ClusterId">ClusterId:</FluentTextField>
-            <FluentTextField @bind-Value="@Content.Match.Path">Path:</FluentTextField>
-        }
-        else
-        {
-            <FluentTextField @bind-Value="@NewRouteId">RouteId:</FluentTextField>
-            <FluentTextField @bind-Value="@NewClusterId">ClusterId:</FluentTextField>
-            <FluentTextField @bind-Value="@NewMatchPath">Path:</FluentTextField>
-        }
-
+        <FluentTextField @bind-Value="@NewRouteId">RouteId:</FluentTextField>
+        <FluentTextField @bind-Value="@NewClusterId">ClusterId:</FluentTextField>
+        <FluentTextField @bind-Value="@NewMatchPath">Path:</FluentTextField>
     </FluentStack>
+
 </FluentDialogBody>
 @* Footer *@
 <FluentDialogFooter>
@@ -45,7 +37,7 @@
 
 @code {
     [Parameter]
-    public RouteDto Content { get; set; } = default!;
+    public RouteDto? Content { get; set; }
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
@@ -59,6 +51,7 @@
     {
         if(Content is not null)
         {
+            NewRouteId = Content.RouteId;
             if(string.IsNullOrEmpty(Content.ClusterId))
             {
                 Content.ClusterId = string.Empty;
@@ -85,11 +78,13 @@
 
     private async Task UpdateAsync()
     {
-        await Dialog.CloseAsync<RouteDto>(Content);
+        if(Content is not null)
+            await Dialog.CloseAsync<RouteDto>(Content);
     }
 
     private async Task CloseAsync()
     {
-        await Dialog.CloseAsync<RouteDto>(Content);
+        if(Content is not null)
+            await Dialog.CloseAsync<RouteDto>(Content);
     }
 }

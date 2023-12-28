@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using ServiceDiscovery.Dotnet.Shared;
+﻿using ServiceDiscovery.Dotnet.Shared;
 using Yarp.ReverseProxy.Configuration;
 
 namespace ServiceDiscovery.Dotnet.ApiGateway;
@@ -33,12 +32,12 @@ public static class ClustersResponses
                 var updateCluster = clusters.Where(c=> c.ClusterId == clusterDto.ClusterId).FirstOrDefault();
                 if(updateCluster is not null && updateCluster.Destinations is not null)
                 {
-                    Dictionary<string,DestinationConfig> destinations = [];
+                    Dictionary<string,Shared.DestinationConfig> destinations = [];
                     foreach (var key in clusterDto.Destinations.Keys)
                     {
                        if(updateCluster.Destinations.TryGetValue(key,out var existingConfig))
                        {
-                            var updatedConfig = new DestinationConfig
+                            var updatedConfig = new Shared.DestinationConfig
                             {
 
                             };
@@ -50,7 +49,7 @@ public static class ClustersResponses
                     {
                         ClusterId = clusterDto.ClusterId,
                         SessionAffinity = clusterDto.SessionAffinity.ToSessionAffinityConfig(),
-                        Destinations = destinations
+                        Destinations = (IReadOnlyDictionary<string, Yarp.ReverseProxy.Configuration.DestinationConfig>)destinations
                     };
                     clustersWitouhtUpdated.Add(updatedCluster);
                     configProvider.Update(routes, clustersWitouhtUpdated);

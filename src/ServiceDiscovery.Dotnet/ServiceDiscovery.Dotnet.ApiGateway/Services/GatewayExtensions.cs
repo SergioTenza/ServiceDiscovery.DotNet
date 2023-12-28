@@ -3,6 +3,7 @@ using Grpc.Core;
 using ServiceDiscovery.Dotnet.Shared;
 using StackExchange.Redis;
 using Yarp.ReverseProxy.Configuration;
+using DestinationConfig = Yarp.ReverseProxy.Configuration.DestinationConfig;
 
 namespace ServiceDiscovery.Dotnet.ApiGateway;
 
