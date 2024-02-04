@@ -21,8 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Development_Infraestructure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDiscovery.Dotnet.Cli", "ServiceDiscovery.Dotnet.Cli\ServiceDiscovery.Dotnet.Cli.csproj", "{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rop.Result.Object", "..\Railway.Oriented.Programming.Dotnet\Rop.Result.Object\Rop.Result.Object.csproj", "{CF5241CC-4687-4AF0-9B9A-CECD4FAA26B2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,10 +55,6 @@ Global
 		{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF5241CC-4687-4AF0-9B9A-CECD4FAA26B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF5241CC-4687-4AF0-9B9A-CECD4FAA26B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF5241CC-4687-4AF0-9B9A-CECD4FAA26B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF5241CC-4687-4AF0-9B9A-CECD4FAA26B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
