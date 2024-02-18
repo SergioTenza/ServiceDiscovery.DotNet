@@ -7,7 +7,14 @@ namespace ServiceDiscovery.Dotnet.Shared;
 
 public class CliInteractiveFlow
 {
-    public static async Task Greet(CliAppConfig cliAppConfig)
+    private readonly CliAppConfig _cliAppConfig;
+
+    public CliInteractiveFlow(CliAppConfig cliAppConfig)
+    {
+        _cliAppConfig = cliAppConfig;
+    }
+
+    public async Task RunAsync()
     {
 
         //AnsiConsole.MarkupLine("[underline Green]ServiceDiscovery.Dotnet[/]");
@@ -110,7 +117,7 @@ public class CliInteractiveFlow
             case "Redis":
                 try
                 {
-                    var isConnected = await cliAppConfig.ConnectToRedis(connection.connectionString);
+                    var isConnected = await _cliAppConfig.ConnectToRedis(connection.connectionString);
                     AnsiConsole.MarkupLineInterpolated($"""[red]Redis[/] connection established: [{(isConnected ? "green" : "red")}]{isConnected}[/]""");
                 }
                 catch (Exception)

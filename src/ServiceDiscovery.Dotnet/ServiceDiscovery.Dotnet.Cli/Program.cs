@@ -12,28 +12,27 @@ internal class Program
 {
     public static async Task Main(string[] args)
     {
-        //var app = new CommandApp<FileSizeCommand>();
-        //app.Run(args);
-        var builder = Host.CreateApplicationBuilder(args);
         if (args?.Length > 0)
         {
-            //builder.Services.GetServicesFromParameters(args, typeof(Program).Assembly?.GetName()?.Version?.ToString() ?? "Cannot obtain Version");
-            //builder.Services.AddSingleton(new CliConfig { Args = args });
-
-
-            var app = new CommandApp<FileSizeCommand>();
+            var app = new CommandApp<BaseCommand>();
+            app.Configure(config =>
+            {
+                //config.AddCommand<FileSizeCommand>("base");                
+            });            
             app.Run(args);
         }
         else
         {
+            var builder = Host.CreateApplicationBuilder(args);
             builder.Services.AddSingleton(new RedisConnectionMultiplexer());
             builder.Services.AddSingleton(new RabbitConnection());
-            var cliConfig = new CliConfig { Args = args };
-            builder.Services.AddSingleton(cliConfig);
-            builder.Services.AddSingleton(new CliAppConfig(new RedisConnectionMultiplexer(), new RabbitConnection(), cliConfig));
-            builder.Services.AddSingleton<CliFlow>();
+            builder.Services.AddSingleton(services =>
+            {
+                return new CliAppConfig(services.GetRequiredService<RedisConnectionMultiplexer>(),services.GetRequiredService<RabbitConnection>());
+            });
+            builder.Services.AddSingleton<CliInteractiveFlow>();
             var host = builder.Build();
-            var cliFlow = host.Services.GetRequiredService<CliFlow>();
+            var cliFlow = host.Services.GetRequiredService<CliInteractiveFlow>();
             await cliFlow.RunAsync();
         }
     }

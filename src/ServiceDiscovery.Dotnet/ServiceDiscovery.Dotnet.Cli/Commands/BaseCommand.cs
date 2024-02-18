@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ServiceDiscovery.Dotnet.Cli.Commands
 {
-    internal sealed class FileSizeCommand : Command<FileSizeCommand.Settings>
+    internal sealed class BaseCommand : Command<BaseCommand.Settings>
     {
         public sealed class Settings : CommandSettings
         {
@@ -13,33 +13,28 @@ namespace ServiceDiscovery.Dotnet.Cli.Commands
             [CommandArgument(0, "[searchPath]")]
             public string? SearchPath { get; init; }
 
-            [CommandOption("-p|--pattern")]
-            public string? SearchPattern { get; init; }
-
-            [CommandOption("--hidden")]
-            [DefaultValue(true)]
-            public bool IncludeHidden { get; init; }
+            [CommandOption("-f|--file")]
+            public string? SearchPattern { get; init; }           
         }
 
         public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings)
         {
             var searchOptions = new EnumerationOptions
             {
-                AttributesToSkip = settings.IncludeHidden
-                    ? FileAttributes.Hidden | FileAttributes.System
-                    : FileAttributes.System
+                AttributesToSkip = FileAttributes.Hidden | FileAttributes.System
             };
-
+            
             var searchPattern = settings.SearchPattern ?? "*.*";
             var searchPath = settings.SearchPath ?? Directory.GetCurrentDirectory();
+            Path.Combine(settings.SearchPath!,settings.SearchPattern!);
             var files = new DirectoryInfo(searchPath)
                 .GetFiles(searchPattern, searchOptions);
-
-            var totalFileSize = files
-                .Sum(fileInfo => fileInfo.Length);
-
-            AnsiConsole.MarkupLine($"Total file size for [green]{searchPattern}[/] files in [green]{searchPath}[/]: [blue]{totalFileSize:N0}[/] bytes");
-
+            if (files.Length == 0)
+            {
+                AnsiConsole.MarkupLine("No files found.");
+                return 1;
+            }            
+            AnsiConsole.MarkupLine($"Found [green]{files.FirstOrDefault()!.Name}[/] files in [green]{searchPath}[/]");
             return 0;
         }
     }
