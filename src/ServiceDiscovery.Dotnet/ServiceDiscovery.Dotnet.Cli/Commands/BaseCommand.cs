@@ -13,8 +13,11 @@ namespace ServiceDiscovery.Dotnet.Cli.Commands
             [CommandArgument(0, "[searchPath]")]
             public string? SearchPath { get; init; }
 
+            [CommandOption("-p|--pattern")]
+            public string? SearchPattern { get; init; }
+
             [CommandOption("-f|--file")]
-            public string? SearchPattern { get; init; }           
+            public string? FileName { get; init; }           
         }
 
         public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings)
@@ -26,7 +29,6 @@ namespace ServiceDiscovery.Dotnet.Cli.Commands
             
             var searchPattern = settings.SearchPattern ?? "*.*";
             var searchPath = settings.SearchPath ?? Directory.GetCurrentDirectory();
-            Path.Combine(settings.SearchPath!,settings.SearchPattern!);
             var files = new DirectoryInfo(searchPath)
                 .GetFiles(searchPattern, searchOptions);
             if (files.Length == 0)
