@@ -17,65 +17,6 @@ public class CliInteractiveFlow
     public async Task RunAsync()
     {
 
-        //AnsiConsole.MarkupLine("[underline Green]ServiceDiscovery.Dotnet[/]");
-        //AnsiConsole.MarkupLine($"[underline Blue]No paramaters received initializing interactive operations...[/]");
-
-        // Create the layout
-        var json = new JsonText(
-        """
-        { 
-            "config" : null
-        }
-        """);
-        var panelJson = new Panel(json)
-               .Header("Communication pattern")
-               .Collapse()
-               .RoundedBorder()
-               .BorderColor(Color.Yellow);
-        var layout = new Layout("Commands");
-        layout["Commands"]
-            .SplitColumns(
-                new Layout("Left")
-                    .SplitRows(
-                    new Layout("Options")),
-                new Layout("Right")
-                    .SplitRows(
-                        new Layout("Rest"),
-                        new Layout("Redis"),
-                        new Layout("RabbitMQ")));
-
-        // Update the left column
-        layout["Options"].Update(panelJson);
-
-        // Render the layout
-        AnsiConsole.Write(layout);
-
-
-        //var grid = new Grid();
-
-        //// Add columns 
-        //grid.AddColumn();
-
-        //// Add header row 
-        //grid.AddRow(new Text[]{
-        //        new Text("Communication", new Style(Color.NavajoWhite1, Color.Black)).LeftJustified(),
-        //        //new Text("Header 2", new Style(Color.Green, Color.Black)).Centered(),
-        //        //new Text("Header 3", new Style(Color.Blue, Color.Black)).RightJustified()
-        //    });
-
-        // Add content row 
-        //grid.AddRow(new Text[]{
-        //        new Text("Row 1").LeftJustified(),
-        //        new Text("Row 2").Centered(),
-        //        new Text("Row 3").RightJustified()
-        //    });
-
-        // Write centered cell grid contents to Console
-        //AnsiConsole.Write(grid);
-
-        //AnsiConsole.Write(panelJson);
-
-
         var communication = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
         .Title("Which [green]communication pattern[/] would you use?")
@@ -91,13 +32,28 @@ public class CliInteractiveFlow
             _ => (string.Empty, string.Empty)
         };
 
+        Console.Clear();       
+        var layout = new Layout("Commands");
+        layout["Commands"]
+            .SplitColumns(
+                new Layout("Left")
+                    .SplitRows(
+                    new Layout("Options"))
+                //new Layout("Right")
+                //    .SplitRows(
+                //        new Layout("Rest"),
+                //        new Layout("Redis"),
+                //        new Layout("RabbitMQ"))
+                );
+        // Render the layout
+        AnsiConsole.Write(layout);
 
         var newJson = JsonSerializer.Serialize(new
         {
             Communication = connection.connectionString,
         });
-        json = new JsonText(newJson);
-        panelJson = new Panel(json)
+        var json = new JsonText(newJson);
+        var panelJson = new Panel(json)
                .Header("Communication pattern")
                .Collapse()
                .RoundedBorder()

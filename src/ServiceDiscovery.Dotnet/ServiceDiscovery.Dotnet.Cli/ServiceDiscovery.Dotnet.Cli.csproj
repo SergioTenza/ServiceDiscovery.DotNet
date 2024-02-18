@@ -12,7 +12,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.7.17" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.48.0" />
-	  <PackageReference Include="Spectre.Console.Json" Version="0.48.1-preview.0.28" />
+	<PackageReference Include="Spectre.Console.Json" Version="0.48.1-preview.0.28" />
 </ItemGroup>
 <ItemGroup>
   <ProjectReference Include="..\..\..\..\Railway.Oriented.Programming.Dotnet\Rop.Result.Object\Rop.Result.Object.csproj" />
