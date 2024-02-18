@@ -1,4 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34321.82
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -12,14 +13,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceDiscovery.Dotnet.Web
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceDiscovery.Dotnet.ApiGateway", "ServiceDiscovery.Dotnet.ApiGateway\ServiceDiscovery.Dotnet.ApiGateway.csproj", "{BDF7A2EC-030A-4947-8CB6-F2EA927030A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDiscovery.Dotnet.Shared", "ServiceDiscovery.Dotnet.Shared\ServiceDiscovery.Dotnet.Shared.csproj", "{097CD0B6-D2B0-41B8-A048-3557EA6386AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceDiscovery.Dotnet.Shared", "ServiceDiscovery.Dotnet.Shared\ServiceDiscovery.Dotnet.Shared.csproj", "{097CD0B6-D2B0-41B8-A048-3557EA6386AE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Development_Infraestructure", "Development_Infraestructure", "{AAE9A63B-2154-418A-BFD9-4E3B47AA1C0D}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDiscovery.Dotnet.Cli", "ServiceDiscovery.Dotnet.Cli\ServiceDiscovery.Dotnet.Cli.csproj", "{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceDiscovery.Dotnet.Cli", "ServiceDiscovery.Dotnet.Cli\ServiceDiscovery.Dotnet.Cli.csproj", "{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rop.Result.Object", "..\..\..\Railway.Oriented.Programming.Dotnet\Rop.Result.Object\Rop.Result.Object.csproj", "{89FB7CE5-3577-4A20-87C4-E170C6336AAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +58,10 @@ Global
 		{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F1F5EB7-4324-43A8-9CD7-A289EC9D691C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89FB7CE5-3577-4A20-87C4-E170C6336AAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89FB7CE5-3577-4A20-87C4-E170C6336AAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89FB7CE5-3577-4A20-87C4-E170C6336AAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89FB7CE5-3577-4A20-87C4-E170C6336AAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
