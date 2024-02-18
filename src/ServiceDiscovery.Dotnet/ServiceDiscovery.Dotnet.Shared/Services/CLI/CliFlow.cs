@@ -1,12 +1,13 @@
-﻿using Spectre.Console;
+﻿using ServiceDiscovery.Dotnet.Shared.Models;
+using Spectre.Console;
 
 namespace ServiceDiscovery.Dotnet.Shared;
 
 public class CliFlow
 {
-    private readonly CliConfig _config;
+    private readonly CliAppConfig _config;
 
-    public CliFlow(CliConfig config)
+    public CliFlow(CliAppConfig config)
     {
         _config = config;
     }
@@ -19,7 +20,7 @@ public class CliFlow
         }
         else if(_config.Args is { } and {Length: <= 0 })
         {
-            await CliInteractiveFlow.Greet();
+            await CliInteractiveFlow.Greet(_config);
         }
         else
         {

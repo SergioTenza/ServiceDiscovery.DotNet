@@ -8,5 +8,11 @@
   <ItemGroup>
     <PackageReference Include="Fluxor.Blazor.Web" Version="5.9.1" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.48.0" />
+	<PackageReference Include="Mono.Options" Version="6.12.0.148" />
+	<PackageReference Include="Spectre.Console.Json" Version="0.48.1-preview.0.28" />
+	<PackageReference Include="StackExchange.Redis" Version="2.7.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Railway.Oriented.Programming.Dotnet\Rop.Result.Object\Rop.Result.Object.csproj" />
   </ItemGroup>
 </Project>

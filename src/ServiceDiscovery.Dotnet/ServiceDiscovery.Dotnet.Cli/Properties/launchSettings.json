@@ -1,8 +1,30 @@
 {
   "profiles": {
-    "ServiceDiscovery.Dotnet.Cli": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "CLI.Parameters": {
+      "commandName": "Project"
+    },
+    "CLI.NoParameters": {
+      "commandName": "Project"
+    },
+    "CLI.Parameters.ConfigFile": {
       "commandName": "Project",
-      "commandLineArgs": ""
+      "commandLineArgs": "-c\r\npath_to_config_file"
+    },
+    "CLI.Parameters.Help": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    },
+    "CLI.Parameters.Version": {
+      "commandName": "Project",
+      "commandLineArgs": "-v"
+    },
+    "CLI.Parameters.Pattern": {
+      "commandName": "Project",
+      "commandLineArgs": "-p *.json"
     }
   }
 }
