@@ -15,7 +15,7 @@ public class CliInteractiveFlow
     }
 
     public async Task RunAsync()
-    {
+    {       
 
         var communication = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
@@ -32,7 +32,7 @@ public class CliInteractiveFlow
             _ => (string.Empty, string.Empty)
         };
 
-        Console.Clear();       
+            
         var layout = new Layout("Commands");
         layout["Commands"]
             .SplitColumns(
@@ -46,7 +46,13 @@ public class CliInteractiveFlow
                 //        new Layout("RabbitMQ"))
                 );
         // Render the layout
-        AnsiConsole.Write(layout);
+        AnsiConsole.Live(layout)
+            .Start(ctx =>
+            {
+
+                ctx.Refresh();        
+            });
+        
 
         var newJson = JsonSerializer.Serialize(new
         {
@@ -61,8 +67,8 @@ public class CliInteractiveFlow
         // Update the left column
         layout["Options"].Update(panelJson);
 
-        // Render the layout
-        AnsiConsole.Write(layout);
+        
+        
 
         AnsiConsole.Markup($"Selected {communication} with ConnectionString: [underline Blue]{connection.connectionString}[/] ");
 

@@ -51,7 +51,7 @@ namespace ServiceDiscovery.Dotnet.Cli.Commands
                 var coincidence = files.Where(f => f.Name == settings.FileName).FirstOrDefault();
                 if (coincidence is null) 
                 {
-                    AnsiConsole.MarkupLineInterpolated($"[red]supplied file [darkgoldenrod]{settings.FileName}[/] was not found on supplied path [blue]{searchPath}[/][/]");
+                    AnsiConsole.MarkupLineInterpolated($"[red]file [darkgoldenrod]{settings.FileName}[/] was not found on supplied path [blue]{searchPath}[/][/]");
                     return 1;
                 }
                 AnsiConsole.MarkupLineInterpolated($"Found [green]{coincidence.Name}[/] in [blue]{searchPath}[/]");

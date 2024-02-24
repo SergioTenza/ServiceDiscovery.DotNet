@@ -17,7 +17,7 @@ internal class Program
             var app = new CommandApp<BaseCommand>();
             app.Configure(config =>
             {
-                //config.AddCommand<FileSizeCommand>("base");                
+                config.AddCommand<RouteCommand>("route");                
             });            
             app.Run(args);
         }

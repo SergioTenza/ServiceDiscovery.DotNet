@@ -30,6 +30,10 @@
     "CLI.Parameters.Pattern.Name": {
       "commandName": "Project",
       "commandLineArgs": "-p *.json -f ServiceDiscovery.Dotnet.Cli.deps.json"
+    },
+    "CLI.Parameters.Route": {
+      "commandName": "Project",
+      "commandLineArgs": "route"
     }
   }
 }
