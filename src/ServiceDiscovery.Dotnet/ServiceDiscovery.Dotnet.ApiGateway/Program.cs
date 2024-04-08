@@ -15,80 +15,99 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
 builder.Services.AddAuthorization();
 builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseInMemoryDatabase("AppDb"));
+	options => options.UseInMemoryDatabase("AppDb"));
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+	.AddEntityFrameworkStores<ApplicationDbContext>();
 builder.AddServiceDefaults();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddReverseProxy()
-    .LoadFromMemory([], []);
-//.LoadFromRedis(builder.Configuration);
+	.LoadFromMemory([], []);
 
-builder.Services.AddMassTransit(x =>
-    {
-        x.SetKebabCaseEndpointNameFormatter();
-        var assembly = typeof(Program).Assembly;
-        x.AddConsumers(assembly);
-        x.UsingRabbitMq((context, cfg) =>
-        {
-            cfg.Host("localhost", "/", h =>
-            {
-                h.Username("guest");
-                h.Password("guest");
-            });
-            cfg.ConfigureEndpoints(context);
-        });
-    });
+
+if (builder.Environment.IsDevelopment())
+{
+	builder.Services.AddMassTransit(x =>
+		{
+			x.SetKebabCaseEndpointNameFormatter();
+			var assembly = typeof(Program).Assembly;
+			x.AddConsumers(assembly);
+			x.UsingRabbitMq((context, cfg) =>
+			{
+				var connectionstring = builder.Configuration.GetConnectionString("rabbitmq");
+				cfg.Host(connectionstring);
+				cfg.ConfigureEndpoints(context);
+			});
+		});
+
+}
+else
+{
+	builder.Services.AddMassTransit(x =>
+	{
+		x.SetKebabCaseEndpointNameFormatter();
+		var assembly = typeof(Program).Assembly;
+		x.AddConsumers(assembly);
+		x.UsingRabbitMq((context, cfg) =>
+		{
+			cfg.Host("localhost", "/", h =>
+			{
+				h.Username("guest");
+				h.Password("guest");
+			});
+			cfg.ConfigureEndpoints(context);
+		});
+	});
+}
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger().UseAuthorization();
-    app.UseSwaggerUI().UseAuthorization();
+	app.UseSwagger().UseAuthorization();
+	app.UseSwaggerUI().UseAuthorization();
 }
 app.UseCors(x =>
 {
-    x.WithOrigins(["http://127.0.0.1:5290"]);
+	x.WithOrigins(["http://127.0.0.1:5290"]);
 });
 app.UseHttpsRedirection();
 app.MapReverseProxy(proxyPipeline =>
 {
-    // Use a custom proxy middleware, defined below
-    proxyPipeline.Use(CustomProxyStep);
-    // Don't forget to include these two middleware when you make a custom proxy pipeline (if you need them).
-    proxyPipeline.UseSessionAffinity();
-    proxyPipeline.UseLoadBalancing();
+	// Use a custom proxy middleware, defined below
+	proxyPipeline.Use(CustomProxyStep);
+	// Don't forget to include these two middleware when you make a custom proxy pipeline (if you need them).
+	proxyPipeline.UseSessionAffinity();
+	proxyPipeline.UseLoadBalancing();
 });
 
 app.MapGroup("/v1")
-    .Gateway()
-    .Routes()
-    .Clusters()
-    .RequireAuthorization();
+	.Gateway()
+	.Routes()
+	.Clusters()
+	.RequireAuthorization();
 
 app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
-    [FromBody] object empty) =>
+	[FromBody] object empty) =>
 {
-    if (empty != null)
-    {
-        await signInManager.SignOutAsync().ConfigureAwait(true);
-        return Results.Ok();
-    }
-    return Results.Unauthorized();
+	if (empty != null)
+	{
+		await signInManager.SignOutAsync().ConfigureAwait(true);
+		return Results.Ok();
+	}
+	return Results.Unauthorized();
 })
 .WithOpenApi()
 .RequireAuthorization();
 
 app.Map("/update", context =>
 {
-    //TODO: Move to get actual data from Redis
-    var configProvider = context.RequestServices.GetRequiredService<InMemoryConfigProvider>();
-    configProvider.Update([], []);
-    return Task.CompletedTask;
+	//TODO: Move to get actual data from Redis
+	var configProvider = context.RequestServices.GetRequiredService<InMemoryConfigProvider>();
+	configProvider.Update([], []);
+	return Task.CompletedTask;
 })
 .RequireAuthorization("Admin");
 
@@ -139,24 +158,25 @@ app.Run();
 // }
 Task CustomProxyStep(HttpContext context, Func<Task> next)
 {
-    // Can read data from the request via the context
-    var useDebugDestinations = context.Request.Headers.TryGetValue(DEBUG_HEADER, out var headerValues) && headerValues.Count == 1 && headerValues[0] == DEBUG_VALUE;
+	// Can read data from the request via the context
+	var useDebugDestinations = context.Request.Headers.TryGetValue(DEBUG_HEADER, out var headerValues) && headerValues.Count == 1 && headerValues[0] == DEBUG_VALUE;
 
-    // The context also stores a ReverseProxyFeature which holds proxy specific data such as the cluster, route and destinations
-    var availableDestinationsFeature = context.Features.Get<IReverseProxyFeature>();
-    var filteredDestinations = new List<DestinationState>();
-    if (availableDestinationsFeature is not null)
-    {
-        // Filter destinations based on criteria
-        foreach (var d in availableDestinationsFeature.AvailableDestinations)
-        {
-            //Todo: Replace with a lookup of metadata - but not currently exposed correctly here
-            if (d.DestinationId.Contains(DEBUG_METADATA_KEY) == useDebugDestinations) { filteredDestinations.Add(d); }
-        }
-        availableDestinationsFeature.AvailableDestinations = filteredDestinations;
-    }
-    // Important - required to move to the next step in the proxy pipeline
-    return next();
+	// The context also stores a ReverseProxyFeature which holds proxy specific data such as the cluster, route and destinations
+	var availableDestinationsFeature = context.Features.Get<IReverseProxyFeature>();
+	var filteredDestinations = new List<DestinationState>();
+	if (availableDestinationsFeature is not null)
+	{
+		// Filter destinations based on criteria
+		foreach (var d in availableDestinationsFeature.AvailableDestinations)
+		{
+			//Todo: Replace with a lookup of metadata - but not currently exposed correctly here
+			if (d.DestinationId.Contains(DEBUG_METADATA_KEY) == useDebugDestinations)
+			{ filteredDestinations.Add(d); }
+		}
+		availableDestinationsFeature.AvailableDestinations = filteredDestinations;
+	}
+	// Important - required to move to the next step in the proxy pipeline
+	return next();
 }
 
 
