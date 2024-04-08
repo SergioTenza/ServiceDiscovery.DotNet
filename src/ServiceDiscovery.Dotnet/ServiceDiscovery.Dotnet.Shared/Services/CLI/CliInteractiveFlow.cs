@@ -5,26 +5,21 @@ using System.Text.Json;
 
 namespace ServiceDiscovery.Dotnet.Shared;
 
-public class CliInteractiveFlow
+public class CliInteractiveFlow(CliAppConfig cliAppConfig)
 {
-    private readonly CliAppConfig _cliAppConfig;
-
-    public CliInteractiveFlow(CliAppConfig cliAppConfig)
-    {
-        _cliAppConfig = cliAppConfig;
-    }
+    private readonly CliAppConfig _cliAppConfig = cliAppConfig;
 
     public async Task RunAsync()
-    {       
+    {
 
-        var communication = AnsiConsole.Prompt(
+        string communication = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
         .Title("Which [green]communication pattern[/] would you use?")
         .PageSize(3)
-        .AddChoices(new[] {
+        .AddChoices([
                  "[red]Redis[/]", "[orange3]RabbitMQ[/]", "[green]Rest[/]"
-        }));
-        (string connectionString, string text) connection = communication switch
+        ]));
+        (string connectionString, string text) = communication switch
         {
             "[red]Redis[/]" => (AnsiConsole.Ask<string>("What's your [red]Redis[/] connectionstring?"), "Redis"),
             "[orange3]RabbitMQ[/]" => (AnsiConsole.Ask<string>("What's your [orange3]RabbitMQ[/] connectionstring?"), "RabbitMQ"),
@@ -52,14 +47,14 @@ public class CliInteractiveFlow
 
                 ctx.Refresh();        
             });
-        
 
-        var newJson = JsonSerializer.Serialize(new
+
+        string newJson = JsonSerializer.Serialize(new
         {
-            Communication = connection.connectionString,
+            Communication = connectionString,
         });
         var json = new JsonText(newJson);
-        var panelJson = new Panel(json)
+        Panel panelJson = new Panel(json)
                .Header("Communication pattern")
                .Collapse()
                .RoundedBorder()
@@ -70,16 +65,16 @@ public class CliInteractiveFlow
         
         
 
-        AnsiConsole.Markup($"Selected {communication} with ConnectionString: [underline Blue]{connection.connectionString}[/] ");
+        AnsiConsole.Markup($"Selected {communication} with ConnectionString: [underline Blue]{connectionString}[/] ");
 
         AnsiConsole.WriteLine($"Stablishing connection please wait.");
 
-        switch (connection.text)
+        switch (text)
         {
             case "Redis":
                 try
                 {
-                    var isConnected = await _cliAppConfig.ConnectToRedis(connection.connectionString);
+                    bool isConnected = await _cliAppConfig.ConnectToRedis(connectionString);
                     AnsiConsole.MarkupLineInterpolated($"""[red]Redis[/] connection established: [{(isConnected ? "green" : "red")}]{isConnected}[/]""");
                 }
                 catch (Exception)

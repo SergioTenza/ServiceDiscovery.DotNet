@@ -70,7 +70,7 @@
             <TemplateColumn Title="Hosts" Align="@Align.Center">
                 @if(context?.Match?.Hosts?.Any() ?? false)
                 {   
-                    <HostsSelect Hosts="context.Match.Hosts.Select(x => new Option<string> { Value = x, Text = x,Selected = false })"/>
+                    @* <HostsSelect Hosts="context.Match.Hosts.Select(x => new Option<string> { Value = x, Text = x,Selected = false })"/> *@
                 }
                 else
                 {
@@ -155,7 +155,7 @@
     {
         var json = await GatewayApi.GetGatewayConfigAsJson();
     }
-    string? activeid = "tab-routes";
+    // string? activeid = "tab-routes";
     FluentTab? changedto;
 
     private void HandleOnTabChange(FluentTab tab)
@@ -166,24 +166,24 @@
     IEnumerable<ClusterDto>? ClusterDialogData {get;set;}
     bool canceled;
 
-    string? clusterValue;
-    Option<string> selectedClusterOption = default!;
+    // string? clusterValue;
+    // Option<string> selectedClusterOption = default!;
 
     private Func<IEnumerable<RouteDto>,IEnumerable<Option<string>>> GetComboOptions = (routes) =>
         {
             var response = routes.Any() ? routes.Select(x=> new Option<string> { Value = x.ClusterId, Text = x.ClusterId,Selected = false }) : [new Option<string> {Value = "no route found",Text = "no route found", Selected =  true}];
             if(response.Any())
             {
-                
+
                 response.Last().Selected = true;
             }
             return response;
         };
     private IEnumerable<Option<string>> routesCombo => GatewayState?.Value?.Routes switch
-        {
-            IEnumerable<RouteDto> routes => GetComboOptions(routes),
-            _ => [new Option<string> {Value = "no route found",Text = "no route found", Selected =  true}]
-        };
+    {
+        IEnumerable<RouteDto> routes => GetComboOptions(routes),
+        _ => [new Option<string> {Value = "no route found",Text = "no route found", Selected =  true}]
+    };
 
 
     protected override async Task OnInitializedAsync()
@@ -212,7 +212,7 @@
         }
         else
         {
-            var dialog = await DialogService.ShowPanelAsync<ClusterDialog>(default, new DialogParameters()
+            var dialog = await DialogService.ShowPanelAsync<ClusterDialog>(new {}, new DialogParameters()
             {
                 Alignment = HorizontalAlignment.Right,
                 Title = $"Create new Cluster",
@@ -224,7 +224,7 @@
             var data = result.Data as IEnumerable<ClusterDto>;  
             if(data is not null)
             {
-                
+
             }
         }
 
@@ -257,7 +257,7 @@
         }
         else    
         {
-            var dialog = await DialogService.ShowPanelAsync<RouteDialog>(default, new DialogParameters()
+            var dialog = await DialogService.ShowPanelAsync<RouteDialog>(new { }, new DialogParameters()
             {
                 Width = "50vw",
                 Alignment = HorizontalAlignment.Right,

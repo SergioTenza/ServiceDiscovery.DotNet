@@ -37,9 +37,9 @@ namespace ServiceDiscovery.Dotnet.Cli.Commands
                 AttributesToSkip = FileAttributes.Hidden | FileAttributes.System
             };
 
-            var searchPattern = settings.SearchPattern ?? "*.*";
-            var searchPath = settings.SearchPath ?? Directory.GetCurrentDirectory();
-            var files = new DirectoryInfo(searchPath)
+            string searchPattern = settings.SearchPattern ?? "*.*";
+            string searchPath = settings.SearchPath ?? Directory.GetCurrentDirectory();
+            FileInfo[] files = new DirectoryInfo(searchPath)
                 .GetFiles(searchPattern, searchOptions);
             if (files.Length == 0)
             {
@@ -48,7 +48,7 @@ namespace ServiceDiscovery.Dotnet.Cli.Commands
             }
             if (!string.IsNullOrEmpty(settings.FileName))
             {
-                var coincidence = files.Where(f => f.Name == settings.FileName).FirstOrDefault();
+                FileInfo? coincidence = files.Where(f => f.Name == settings.FileName).FirstOrDefault();
                 if (coincidence is null) 
                 {
                     AnsiConsole.MarkupLineInterpolated($"[red]file [darkgoldenrod]{settings.FileName}[/] was not found on supplied path [blue]{searchPath}[/][/]");
@@ -64,7 +64,7 @@ namespace ServiceDiscovery.Dotnet.Cli.Commands
             });
             AnsiConsole.MarkupLineInterpolated($"in [blue]{searchPath}[/]");
             AnsiConsole.WriteLine();
-            var communication = AnsiConsole.Prompt(
+            string communication = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .Title("Which [green]file[/] do you want to use?")
                 .PageSize(3)
