@@ -12,13 +12,11 @@ const string DEBUG_METADATA_KEY = "debug";
 const string DEBUG_VALUE = "true";
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
 builder.Services.AddCors();
 builder.Services.AddAuthorization();
-builder.Services.AddDbContext<ApplicationDbContext>(
-	options => options.UseInMemoryDatabase("AppDb"));
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-	.AddEntityFrameworkStores<ApplicationDbContext>();
-builder.AddServiceDefaults();
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -28,6 +26,8 @@ builder.Services.AddReverseProxy()
 
 if (builder.Environment.IsDevelopment())
 {
+	builder.Services.AddDbContext<ApplicationDbContext>(
+	options => options.UseInMemoryDatabase("AppDb"));
 	builder.Services.AddMassTransit(x =>
 		{
 			x.SetKebabCaseEndpointNameFormatter();
@@ -44,6 +44,10 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
+	//TODO: Remove this to add Aspire.Npgsql.EntityFrameworkCore.PostgreSQL when out of pre-release
+	//builder.AddNpgsqlDbContext<ApplicationDbContext>("AppDb");
+	builder.Services.AddDbContext<ApplicationDbContext>(
+	options => options.UseInMemoryDatabase("AppDb"));
 	builder.Services.AddMassTransit(x =>
 	{
 		x.SetKebabCaseEndpointNameFormatter();
@@ -60,6 +64,8 @@ else
 		});
 	});
 }
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+	.AddEntityFrameworkStores<ApplicationDbContext>();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
