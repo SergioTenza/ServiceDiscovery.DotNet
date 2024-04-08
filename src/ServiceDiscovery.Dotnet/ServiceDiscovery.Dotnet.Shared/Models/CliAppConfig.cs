@@ -1,17 +1,15 @@
-﻿using ServiceDiscovery.Dotnet.Shared.Services.Rabbit;
+using ServiceDiscovery.Dotnet.Shared.Services.Rabbit;
 using ServiceDiscovery.Dotnet.Shared.Services.Redis;
 
 namespace ServiceDiscovery.Dotnet.Shared.Models
 {
     public record CliAppConfig
     {
-        private RedisConnectionMultiplexer _redisConnectionMultiplexer;
-        private RabbitConnection _rabbitConnection;   
+        private readonly RedisConnectionMultiplexer _redisConnectionMultiplexer;        
 
-        public CliAppConfig(RedisConnectionMultiplexer redisConnectionMultiplexer, RabbitConnection rabbitConnection)
+        public CliAppConfig(RedisConnectionMultiplexer redisConnectionMultiplexer)
         {
             _redisConnectionMultiplexer = redisConnectionMultiplexer;
-            _rabbitConnection = rabbitConnection;
         }
 
         public string ConfigPathName { get; init; } = string.Empty;
@@ -19,7 +17,7 @@ namespace ServiceDiscovery.Dotnet.Shared.Models
 
         public async Task<bool> ConnectToRedis(string connectionString)
         {
-            var connect = await _redisConnectionMultiplexer.ConnectToRedis(connectionString);
+            var connect = await _redisConnectionMultiplexer.ConnectToRedis(connectionString).ConfigureAwait(true);
             return connect.IsSuccess;
         }        
     }

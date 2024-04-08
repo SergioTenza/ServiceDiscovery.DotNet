@@ -75,7 +75,7 @@ app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
 {
     if (empty != null)
     {
-        await signInManager.SignOutAsync();
+        await signInManager.SignOutAsync().ConfigureAwait(true);
         return Results.Ok();
     }
     return Results.Unauthorized();

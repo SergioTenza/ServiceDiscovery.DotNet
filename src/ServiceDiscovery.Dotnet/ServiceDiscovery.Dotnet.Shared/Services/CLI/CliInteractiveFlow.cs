@@ -1,6 +1,8 @@
-﻿using ServiceDiscovery.Dotnet.Shared.Models;
+using ServiceDiscovery.Dotnet.Shared.Models;
 using Spectre.Console;
 using Spectre.Console.Json;
+using StackExchange.Redis;
+using System.Globalization;
 using System.Text.Json;
 
 namespace ServiceDiscovery.Dotnet.Shared;
@@ -74,13 +76,14 @@ public class CliInteractiveFlow(CliAppConfig cliAppConfig)
             case "Redis":
                 try
                 {
-                    bool isConnected = await _cliAppConfig.ConnectToRedis(connectionString);
-                    AnsiConsole.MarkupLineInterpolated($"""[red]Redis[/] connection established: [{(isConnected ? "green" : "red")}]{isConnected}[/]""");
+                    bool isConnected = await _cliAppConfig.ConnectToRedis(connectionString).ConfigureAwait(true);
+					
+					AnsiConsole.MarkupLineInterpolated(CultureInfo.CurrentCulture, $"""[red]Redis[/] connection established: [{(isConnected ? "green" : "red")}]{isConnected}[/]""");
                 }
-                catch (Exception)
+                catch (RedisConnectionException ex)
                 {
-                    AnsiConsole.MarkupLineInterpolated($"""[red]Redis[/] connection [underline Red]not established[/]: [red]false[/]""");
-                    //AnsiConsole.WriteException(ex);
+                    AnsiConsole.MarkupLineInterpolated(CultureInfo.CurrentCulture, $"""[red]Redis[/] connection [underline Red]not established[/]: [red]false[/]""");
+                    AnsiConsole.WriteException(ex);
                 }
 
                 break;

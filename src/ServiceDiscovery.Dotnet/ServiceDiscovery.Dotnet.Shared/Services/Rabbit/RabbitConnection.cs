@@ -1,6 +1,5 @@
-﻿namespace ServiceDiscovery.Dotnet.Shared.Services.Rabbit
+namespace ServiceDiscovery.Dotnet.Shared.Services.Rabbit;
+
+public class RabbitConnection
 {
-    public class RabbitConnection
-    {
-    }
 }

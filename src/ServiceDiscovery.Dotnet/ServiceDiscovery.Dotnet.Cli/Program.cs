@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ServiceDiscovery.Dotnet.Cli.Commands;
 using ServiceDiscovery.Dotnet.Shared;
@@ -8,7 +8,7 @@ using ServiceDiscovery.Dotnet.Shared.Services.Redis;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-internal class Program
+internal sealed class Program
 {
     public static async Task Main(string[] args)
     {
@@ -19,7 +19,7 @@ internal class Program
             {
                 config.AddCommand<RouteCommand>("route");                
             });            
-            app.Run(args);
+            await app.RunAsync(args).ConfigureAwait(true);
         }
         else
         {
@@ -28,12 +28,12 @@ internal class Program
             builder.Services.AddSingleton(new RabbitConnection());
             builder.Services.AddSingleton(services =>
             {
-                return new CliAppConfig(services.GetRequiredService<RedisConnectionMultiplexer>(),services.GetRequiredService<RabbitConnection>());
+                return new CliAppConfig(services.GetRequiredService<RedisConnectionMultiplexer>());
             });
             builder.Services.AddSingleton<CliInteractiveFlow>();
             var host = builder.Build();
             var cliFlow = host.Services.GetRequiredService<CliInteractiveFlow>();
-            await cliFlow.RunAsync();
+            await cliFlow.RunAsync().ConfigureAwait(true);
         }
     }
 }

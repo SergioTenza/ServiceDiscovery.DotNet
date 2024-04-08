@@ -1,4 +1,4 @@
-﻿using Spectre.Console.Cli;
+using Spectre.Console.Cli;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace ServiceDiscovery.Dotnet.Cli.Commands
 {
-    public sealed class RouteCommand: Command<RouteCommand.Settings>
+    internal sealed class RouteCommand: Command<RouteCommand.Settings>
     {
 
-        public sealed class Settings : CommandSettings
+        internal sealed class Settings : CommandSettings
         {
             [Description("RouteId to add. Adds new route to api gateway.")]
             [CommandArgument(0, "[searchPath]")]

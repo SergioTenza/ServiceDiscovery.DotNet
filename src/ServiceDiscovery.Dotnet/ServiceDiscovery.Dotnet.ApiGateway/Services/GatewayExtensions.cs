@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Grpc.Core;
 using ServiceDiscovery.Dotnet.Shared;
 using StackExchange.Redis;
@@ -79,7 +79,9 @@ public static class GatewayExtensions
 	public static SessionAffinityDto ToSessionAffinityDto(this SessionAffinityConfig sessionAffinityConfig) =>
 		new()
 		{
-
+			AffinityKeyName = sessionAffinityConfig.AffinityKeyName,
+			Enabled	= sessionAffinityConfig?.Enabled ?? true,
+			Policy = sessionAffinityConfig?.Policy ?? "Cookie"
 		};
 
 	public static Dictionary<string, DestinationConfigDto> ToDestinationConfigDto(this IReadOnlyDictionary<string, DestinationConfig> destinationConfig) =>
@@ -95,6 +97,7 @@ public static class GatewayExtensions
 		: [];
 	public static IReverseProxyBuilder LoadFromRedis(this IReverseProxyBuilder builder, IConfiguration configuration)
 	{
+#pragma warning disable CA1031 // No capture tipos de excepción generales.
 		try 
 		{
 			
@@ -116,12 +119,13 @@ public static class GatewayExtensions
             builder.Services.AddSingleton(new InMemoryConfigProvider(routeConfigs!, clusterConfigs!));
             builder.Services.AddSingleton((Func<IServiceProvider, IProxyConfigProvider>)((IServiceProvider s) => s.GetRequiredService<InMemoryConfigProvider>()));
         } 
-		catch 
+		catch(Exception ex) 
 		{
             builder.Services.AddSingleton(new InMemoryConfigProvider([], []));
             builder.Services.AddSingleton((Func<IServiceProvider, IProxyConfigProvider>)((IServiceProvider s) => s.GetRequiredService<InMemoryConfigProvider>()));
         }
-		
+#pragma warning restore CA1031 // No capture tipos de excepción generales.
+
 		return builder;
 	}
 	public static (IReadOnlyList<RouteConfig> routes, IReadOnlyList<ClusterConfig> clusters) GetProxyFromRedis(

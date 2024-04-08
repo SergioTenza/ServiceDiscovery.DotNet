@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http.HttpResults;
 using ServiceDiscovery.Dotnet.Shared;
@@ -8,7 +8,7 @@ namespace ServiceDiscovery.Dotnet.ApiGateway;
 
 public static class RoutesResponses
 {
-    public static Func<RouteDto, InMemoryConfigProvider, IResult> InsertRoute = (routeDto, configProvider) =>
+    internal static Func<RouteDto, InMemoryConfigProvider, IResult> InsertRoute = (routeDto, configProvider) =>
     {
         try
         {
@@ -23,7 +23,7 @@ public static class RoutesResponses
             return Results.Problem(ex.Message, nameof(routeDto), 500, "Error Adding the route.");
         }
     };
-    public static Func<RouteDto, RouteConfig,InMemoryConfigProvider, IResult> UpdateRoute = (routeDto, routeConfig,configProvider) =>
+	internal static Func<RouteDto, RouteConfig,InMemoryConfigProvider, IResult> UpdateRoute = (routeDto, routeConfig,configProvider) =>
     {
         try
         {
@@ -37,7 +37,7 @@ public static class RoutesResponses
         }
     };
 
-     public static Func<RouteConfig,InMemoryConfigProvider, IResult> DeleteRoute = (routeConfig,configProvider) =>
+	internal static Func<RouteConfig,InMemoryConfigProvider, IResult> DeleteRoute = (routeConfig,configProvider) =>
     {
         try
         { 
@@ -68,7 +68,7 @@ public static class RoutesResponses
             configProvider.Update(updatedRoutes, clusters.ToList());
             return Results.Ok(routeDto);
         }
-        catch (Exception ex)
+        catch (NullReferenceException ex)
         {
             return Results.Problem(ex.Message, nameof(routeDto), 500, "Error Updating the route.");
         }
