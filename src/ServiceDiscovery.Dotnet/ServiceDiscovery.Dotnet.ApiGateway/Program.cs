@@ -24,46 +24,24 @@ builder.Services.AddReverseProxy()
 	.LoadFromMemory([], []);
 
 
-if (builder.Environment.IsDevelopment())
-{
-	builder.Services.AddDbContext<ApplicationDbContext>(
-	options => options.UseInMemoryDatabase("AppDb"));
-	builder.Services.AddMassTransit(x =>
-		{
-			x.SetKebabCaseEndpointNameFormatter();
-			var assembly = typeof(Program).Assembly;
-			x.AddConsumers(assembly);
-			x.UsingRabbitMq((context, cfg) =>
-			{
-				var connectionstring = builder.Configuration.GetConnectionString("rabbitmq");
-				cfg.Host(connectionstring);
-				cfg.ConfigureEndpoints(context);
-			});
-		});
 
-}
-else
-{
-	//TODO: Remove this to add Aspire.Npgsql.EntityFrameworkCore.PostgreSQL when out of pre-release
-	//builder.AddNpgsqlDbContext<ApplicationDbContext>("AppDb");
-	builder.Services.AddDbContext<ApplicationDbContext>(
-	options => options.UseInMemoryDatabase("AppDb"));
-	builder.Services.AddMassTransit(x =>
+builder.Services.AddDbContext<ApplicationDbContext>(
+options => options.UseInMemoryDatabase("AppDb"));
+builder.Services.AddMassTransit(x =>
 	{
 		x.SetKebabCaseEndpointNameFormatter();
 		var assembly = typeof(Program).Assembly;
 		x.AddConsumers(assembly);
 		x.UsingRabbitMq((context, cfg) =>
 		{
-			cfg.Host("localhost", "/", h =>
-			{
-				h.Username("guest");
-				h.Password("guest");
-			});
+			var connectionstring = builder.Configuration.GetConnectionString("queue");
+			cfg.Host(connectionstring);
 			cfg.ConfigureEndpoints(context);
 		});
 	});
-}
+
+
+
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
 	.AddEntityFrameworkStores<ApplicationDbContext>();
 var app = builder.Build();

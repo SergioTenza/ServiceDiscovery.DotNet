@@ -1,9 +1,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var cache = builder.AddRedisContainer("cache");
-var queue = builder.AddRabbitMQ("rabbitmq");
-var postgres = builder.AddPostgres("postgresdb")
-						.AddDatabase("AppDb");
+var cache = builder.AddRedis("cache");
+var queue = builder.AddRabbitMQ("queue");
+var postgres = builder.AddPostgres("postgresdb").AddDatabase("AppDb");
 
 var apiservice = builder.AddProject<Projects.ServiceDiscovery_Dotnet_ApiService>("apiservice");
 
