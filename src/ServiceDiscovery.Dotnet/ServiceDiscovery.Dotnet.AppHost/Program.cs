@@ -7,8 +7,9 @@ var postgres = builder.AddPostgres("postgresdb").AddDatabase("AppDb");
 var apiservice = builder.AddProject<Projects.ServiceDiscovery_Dotnet_ApiService>("apiservice");
 
 builder.AddProject<Projects.ServiceDiscovery_Dotnet_Web>("webfrontend")
-    .WithReference(cache)
-    .WithReference(apiservice);
+	.WithReference(cache)
+	.WithReference(apiservice)
+	.WithReference(queue);
 
 builder.AddProject<Projects.ServiceDiscovery_Dotnet_ApiGateway>("apigateway")
 	.WithReference(cache)

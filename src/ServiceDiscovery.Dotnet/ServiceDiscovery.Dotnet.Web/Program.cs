@@ -10,29 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
 
+builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
-if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
+builder.AddRabbitMQClient("queue");
+builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://gateway/v1"));
+builder.Services.AddHttpClient("Gateway", client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
+builder.Services.AddMassTransit(x =>
 {
-	builder.AddServiceDefaults();
-	builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://gateway/v1"));
-}
-else
-{
-	builder.Services.AddHttpClient<GatewayApiClient>(client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
-	builder.Services.AddHttpClient("Gateway", client => client.BaseAddress = new("http://127.0.0.1:5024/v1"));
-	builder.Services.AddMassTransit(x =>
+	x.SetKebabCaseEndpointNameFormatter();
+	x.UsingRabbitMq((context, cfg) =>
 	{
-		x.SetKebabCaseEndpointNameFormatter();
-		x.UsingRabbitMq((context, cfg) =>
-		{
-			cfg.Host("localhost", "/", h =>
-			{
-				h.Username("guest");
-				h.Password("guest");
-			});
-		});
+		var connectionString = builder.Configuration.GetConnectionString("queue");
+		cfg.Host(connectionString);
 	});
-}
+});
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -40,7 +32,7 @@ builder.Services.AddRazorComponents()
 
 // Fluxor State
 builder.Services.AddFluxor(options =>
-    options.ScanAssemblies(typeof(Program).Assembly, [typeof(BaseState).Assembly])
+	options.ScanAssemblies(typeof(Program).Assembly, [typeof(BaseState).Assembly])
 );
 // FluentUI
 builder.Services.AddScoped<ITooltipService, TooltipService>();
@@ -57,7 +49,7 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+	.AddInteractiveServerRenderMode();
 
 app.UseOutputCache();
 if (!app.Environment.IsDevelopment())
