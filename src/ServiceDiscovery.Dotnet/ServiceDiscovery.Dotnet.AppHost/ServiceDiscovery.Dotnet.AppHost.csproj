@@ -11,12 +11,15 @@
   <ItemGroup>
     <ProjectReference Include="..\ServiceDiscovery.Dotnet.ApiGateway\ServiceDiscovery.Dotnet.ApiGateway.csproj" />
     <ProjectReference Include="..\ServiceDiscovery.Dotnet.ApiService\ServiceDiscovery.Dotnet.ApiService.csproj" />
+    <ProjectReference Include="..\ServiceDiscovery.Dotnet.ServiceDefaults\ServiceDiscovery.Dotnet.ServiceDefaults.csproj" />
     <ProjectReference Include="..\ServiceDiscovery.Dotnet.Web\ServiceDiscovery.Dotnet.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.3.24105.21" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
+    <PackageReference Include="Aspire.Hosting" Version="8.0.1" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.1" />
+	<PackageReference Include="Aspire.Hosting.Redis" Version="8.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.2" />
   </ItemGroup>
 
 </Project>
